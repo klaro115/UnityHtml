@@ -1,0 +1,21 @@
+﻿<head>
+# This is a comment line. It will be ignored by the interpreter. Comments can be placed anywhere in you Utml file.
+
+# The base style can be defined in the header block:
+style={fontColor=black textColor=black}
+
+
+</head>
+<body>
+
+<p>Hello World.\nThis is a test to see if multi-line paragraph objects are working properly.\n
+Is everything working as expected? We shall see...</p>
+<p style={labelSize=20}>This text block has a larger font size.</p>
+
+<input label="Try writing something" binding={path=":displayInputString" type=single}/>
+
+<p tag="outputParagraph" label="">
+
+<button label="Hello World" binding={path=":printHelloWorld" type=single, disable=true}/>
+
+</body>
