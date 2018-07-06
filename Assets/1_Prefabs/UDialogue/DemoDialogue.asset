@@ -27,6 +27,32 @@ MonoBehaviour:
     eventString: 
   rootNodes:
   - node: {fileID: 114218101850340150}
+--- !u!114 &114177795553884494
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
+  m_Name: 4 Job Lost
+  m_EditorClassIdentifier: 
+  content:
+  - speakerId: 0
+    text: 'Yeah, about that: I kinda got myself fired.'
+    timeout: -1
+    eventBinding:
+      path: 
+      type: 0
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  responses:
+  - responseText: '[Leave dicreetly]'
+    nextNode: {fileID: 0}
+  - responseText: '... Can I go now?'
+    nextNode: {fileID: 114454049409595624}
 --- !u!114 &114218101850340150
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -36,12 +62,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
-  m_Name: Greeting
+  m_Name: 0 Greeting
   m_EditorClassIdentifier: 
   content:
   - speakerId: 0
     text: Hello
-    timeout: -1
+    timeout: 0
     eventBinding:
       path: 
       type: 0
@@ -62,7 +88,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
-  m_Name: PessimistRant
+  m_Name: 1 PessimistRant
   m_EditorClassIdentifier: 
   content:
   - speakerId: 0
@@ -80,7 +106,7 @@ MonoBehaviour:
   - responseText: Sucks to be you.
     nextNode: {fileID: 114304624129262888}
   - responseText: '''aight. [Back away slowly]'
-    nextNode: {fileID: 0}
+    nextNode: {fileID: 114454049409595624}
 --- !u!114 &114304624129262888
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -90,11 +116,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
-  m_Name: Spiteful
+  m_Name: 2 Spiteful
   m_EditorClassIdentifier: 
   content:
   - speakerId: 0
-    text: Well, f*ck you too, buddy.
+    text: Well, screw you too, buddy.
     timeout: -1
     eventBinding:
       path: 
@@ -104,7 +130,7 @@ MonoBehaviour:
       eventString: 
   responses:
   - responseText: What about work?
-    nextNode: {fileID: 114295821561744242}
+    nextNode: {fileID: 114177795553884494}
   - responseText: '[Leave]'
     nextNode: {fileID: 0}
 --- !u!114 &114355330719392628
@@ -116,7 +142,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
-  m_Name: Compassionate
+  m_Name: 3 Compassionate
   m_EditorClassIdentifier: 
   content:
   - speakerId: 0
@@ -129,5 +155,57 @@ MonoBehaviour:
       eventValue: 0
       eventString: 
   responses:
+  - responseText: '[Awkwardly stand there]'
+    nextNode: {fileID: 114741023516838926}
   - responseText: '[Leave]'
+    nextNode: {fileID: 0}
+--- !u!114 &114454049409595624
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
+  m_Name: 5 Start Battle
+  m_EditorClassIdentifier: 
+  content:
+  - speakerId: 0
+    text: Oh no, you ain't goin' nowhere, buddy!
+    timeout: -1
+    eventBinding:
+      path: 
+      type: 0
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  responses:
+  - responseText: '[Fight]'
+    nextNode: {fileID: 0}
+  - responseText: Wait. Shouldn't you be going to work now?
+    nextNode: {fileID: 114177795553884494}
+--- !u!114 &114741023516838926
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
+  m_Name: 6 Romance
+  m_EditorClassIdentifier: 
+  content:
+  - speakerId: 0
+    text: Hey, um... Do you wanna, like, stay the night?
+    timeout: -1
+    eventBinding:
+      path: 
+      type: 0
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  responses:
+  - responseText: '[Run]'
     nextNode: {fileID: 0}

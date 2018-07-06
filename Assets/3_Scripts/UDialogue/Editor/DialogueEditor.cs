@@ -79,6 +79,12 @@ namespace UDialogue
 				selected = nodes[selectedNodeIndex];
 			}
 
+			// Make sure there is always a node editor instance at hand:
+			if(nodeEditor == null)
+			{
+				nodeEditor = new DialogueNodeEditor();
+			}
+
 
 			// B) HEADER:
 
@@ -91,7 +97,7 @@ namespace UDialogue
 			{
 				dialogue = newDialogue;
 				assetChanged = true;
-				if(nodeEditor != null) nodeEditor.setSelection(DialogueNodeEditor.Node.Blank);
+				nodeEditor.setSelection(DialogueNodeEditor.Node.Blank);
 			}
 
 			//Buttons for layouting:
@@ -103,18 +109,19 @@ namespace UDialogue
 					DialogueEditorHelper.saveDialogueAsset(dialogue);
 					assetChanged = false;
 				}
-				if(GUILayout.Button("Rebuild graph") && nodeEditor != null)
+				if(GUILayout.Button("Rebuild graph"))
 				{
-					createNodeList();
+					DialogueNodeEditor.createNodeList(dialogue, ref nodes);
 					nodeEditor.autoLayoutNodes();
 				}
-				if(GUILayout.Button("Auto-Layout") && nodeEditor != null)
+				if(GUILayout.Button("Auto-Layout"))
 				{
 					nodeEditor.autoLayoutNodes();
 				}
 				EditorGUILayout.EndHorizontal();
 			}
 			GUILayout.EndArea();
+
 			// Buttons for creating, deleting and duplicating node assets:
 			GUILayout.BeginArea(new Rect(Screen.width-303,19,300,18));
 			{
@@ -122,17 +129,17 @@ namespace UDialogue
 				if(GUILayout.Button("New Node"))
 				{
 					// Create new node and select it right away:
-					if(createNewNode())
+					if(DialogueNodeEditor.createNewNode(dialogue, ref nodes))
 						selectNode(nodes.Count - 1);
 				}
-				EditorGUI.BeginDisabledGroup(selected.node == null);
+				EditorGUI.BeginDisabledGroup(nodeEditor.Selected.node == null);
 				if(GUILayout.Button("Delete Node"))
 				{
-					deleteNode(selected.node);
+					deleteNode(nodeEditor.Selected.node);
 				}
 				if(GUILayout.Button("Duplicate"))
 				{
-					duplicateNode(selected);
+					duplicateNode(nodeEditor.Selected);
 				}
 				EditorGUI.EndDisabledGroup();
 				EditorGUILayout.EndHorizontal();
@@ -151,14 +158,12 @@ namespace UDialogue
 
 			if(nodes == null && dialogue != null && dialogue.rootNodes != null)
 			{
-				createNodeList();
+				DialogueNodeEditor.createNodeList(dialogue, ref nodes);
 			}
 
 			// Draw existing nodes in their relative positions here with all their dependencies.
 			if(dialogue != null && nodes != null)
 			{
-				if(nodeEditor == null) nodeEditor = new DialogueNodeEditor();
-
 				assetChanged = assetChanged || nodeEditor.drawNodes(nodes);
 			}
 
@@ -197,56 +202,6 @@ namespace UDialogue
 			return true;
 		}
 
-		private void createNodeList()
-		{
-			// Initialize list if it hasn't been done already:
-			if(nodes == null) nodes = new List<DialogueNodeEditor.Node>();
-			nodes.Clear();
-
-			string assetPath = AssetDatabase.GetAssetPath(dialogue);
-			object[] allAssets = AssetDatabase.LoadAllAssetsAtPath(assetPath);
-			foreach(object asset in allAssets)
-			{
-				DialogueNode dNode = asset as DialogueNode;
-				if(dNode == null) continue;
-				int newRootId = -1;
-				for(int i = 0; i < dialogue.rootNodes.Length; ++i)
-					if(dNode == dialogue.rootNodes[i].node) newRootId = i;
-				DialogueNodeEditor.Node newNode = new DialogueNodeEditor.Node()
-					{ node=dNode, rootId=newRootId, rect=new Rect(100,100,128,64) };
-				nodes.Add(newNode);
-			}
-		}
-		private bool createNewNode()
-		{
-			// Make sure the dialogue asset is non-null:
-			if(dialogue == null) return false;
-			// Update node list: (initialize list and load existing nodes from dialogue asset)
-			if(nodes == null || nodes.Count == 0) createNodeList();
-
-			// Create a new node asset in dialogue:
-			DialogueNode newDNode = DialogueEditorHelper.createNewNode(dialogue);
-			// Create an editor node representation:
-			DialogueNodeEditor.Node newNode = DialogueNodeEditor.Node.Blank;
-			newNode.node = newDNode;
-
-			// Set newly created node as root node if no root has been assigned yet:
-			if(dialogue.rootNodes == null || dialogue.rootNodes.Length == 0)
-			{
-				// Create new root node in dialogue with no conditions:
-				DialogueConditions newRootConds = DialogueConditions.None;
-				DialogueRoot newRoot = new DialogueRoot() { node=newDNode, conditions=newRootConds };
-				dialogue.rootNodes = new DialogueRoot[1] { newRoot };
-				newNode.rootId = 0;
-
-				// Save changes to asset:
-				DialogueEditorHelper.saveDialogueAsset(dialogue);
-			}
-
-			// Add the new node representation to nodes list:
-			nodes.Add(newNode);
-			return true;
-		}
 		private bool deleteNode(DialogueNode dNode)
 		{
 			if(dialogue == null || dNode == null) return false;

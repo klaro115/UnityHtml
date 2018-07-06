@@ -42,6 +42,14 @@ namespace UDialogue
 		//...
 
 		#endregion
+		#region Properties
+
+		public Node Selected
+		{
+			get { return selected; }
+		}
+
+		#endregion
 		#region Methods UI
 
 		public void setSelection(Node newSelection)
@@ -50,10 +58,14 @@ namespace UDialogue
 			if(selected.node != newSelection.node)
 			{
 				dragNDrop = false;
+				selectedResponse = -1;
+				selectedResponseDropdown = false;
 			}
 
+			// Set selection:
 			selected = newSelection;
 
+			// Select dialogue node asset for editing in inspector:
 			if(selected.node != null)
 			{
 				Selection.activeObject = selected.node;
@@ -95,13 +107,25 @@ namespace UDialogue
 						for(int j = 0; j < dNode.responses.Length; ++j)
 						{
 							DialogueResponse resp = dNode.responses[j];
-							if(resp.nextNode == null) continue;
+							Vector2 respPos = getResponsePosition(node, j);
+							if (resp.nextNode == null)
+							{
+								Handles.color = Color.red;
+								Handles.DrawLine(respPos, respPos + Vector2.right * 32);
+								continue;
+							}
 
 							Node targetNode = Node.Blank;
 							foreach(Node n in nodes)
-								if(n.node == resp.nextNode) targetNode = n;
+							{
+								if(n.node == resp.nextNode)
+								{
+									targetNode = n;
+									break;
+								}
+							}
 							
-							drawNodeLink(getResponsePosition(node, j), targetNode);
+							drawNodeLink(respPos, targetNode);
 						}
 					}
 				}
@@ -124,10 +148,14 @@ namespace UDialogue
 					if(isSelected && dragNDrop)
 					{
 						Vector2 mousePos = Event.current.mousePosition;
-						node.rect.x = mousePos.x-123;
-						node.rect.y = mousePos.y-5;
+						node.rect.x = mousePos.x - 123;
+						node.rect.y = mousePos.y - 5;
 						actions.changed = true;
 					}
+
+					// Round positions to whole numbers, 'cause without it the damn thing looks ugly as hell:
+					node.rect.x = Mathf.Round(node.rect.x);
+					node.rect.y = Mathf.Round(node.rect.y);
 
 					// Draw the node on screen:
 					actions = drawNode(ref node, isSelected, i);
@@ -152,25 +180,41 @@ namespace UDialogue
 
 					Rect respRect = respNode.rect;
 					float respPosY = respRect.y+34 + (-respDNode.responses.Length*.5f + selectedResponse) * 17;
-					respRect = new Rect(respRect.x+138,respPosY,122,39);
+					respRect = new Rect(respRect.x+138,respPosY,122,57);
 
 					GUI.BeginGroup(respRect);
 
-					EditorGUI.DrawRect(new Rect(0,0,122,39), Color.black);
-					EditorGUI.DrawRect(new Rect(1,1,120,37), new Color(0.75f,0.75f,0.75f));
+					EditorGUI.DrawRect(new Rect(0,0,122,57), Color.black);
+					EditorGUI.DrawRect(new Rect(1,1,120,55), new Color(0.75f,0.75f,0.75f));
 
 					if(GUI.Button(new Rect(2,2,118,16), "New Node"))
 					{
-						Debug.Log("Creating new node connected to selected node's response " + selectedResponse);
-						Debug.Log("NOT IMPLEMENTED");
+						string assetPath = AssetDatabase.GetAssetPath(selected.node);
+						Dialogue asset = AssetDatabase.LoadMainAssetAtPath(assetPath) as Dialogue;
+
+						if (createNewNode(asset, ref nodes))
+						{
+							int newNodeId = nodes.Count - 1;
+							if(createNodeLink(selected, selectedResponse, newNodeId))
+							{
+								Debug.Log("Creating new node connected to selected node's response " + selectedResponse);
+								setSelection(nodes[newNodeId]);
+							}
+						}
 					}
-					if(GUI.Button(new Rect(2,20,88,16), "Connect to ID"))
+					EditorGUI.BeginDisabledGroup(selected.node.responses != null && selected.node.responses[selectedResponse].nextNode == null);
+					if (GUI.Button(new Rect(2, 20, 118, 16), "Clear Link"))
 					{
-						Debug.Log("Connecting selected node's response " + selectedResponse +
-							" to node " + responseTargetNodeId);
-						Debug.Log("NOT IMPLEMENTED");
+						Debug.Log("Resetting response " + selectedResponse + " in selected node.");
+						createNodeLink(respNode, selectedResponse, -1);
 					}
-					responseTargetNodeId = EditorGUI.DelayedIntField(new Rect(91,20,29,16), responseTargetNodeId);
+					EditorGUI.EndDisabledGroup();
+					if (GUI.Button(new Rect(2,38,88,16), "Link to ID"))
+					{
+						if(createNodeLink(respNode, selectedResponse, responseTargetNodeId))
+							Debug.Log("Connecting selected node's response " + selectedResponse + " to node " + responseTargetNodeId);
+					}
+					responseTargetNodeId = EditorGUI.DelayedIntField(new Rect(91,38,29,16), responseTargetNodeId);
 
 					GUI.EndGroup();
 				}
@@ -195,8 +239,14 @@ namespace UDialogue
 
 			// HEADER:
 
-			EditorGUI.LabelField(new Rect(0,0,106,16), nodeIndex + ") " + dNode.name);
-			if(isSelected) dNode.name = (EditorGUI.DelayedTextField(new Rect(13,0,105,16), dNode.name));
+			string nodeTitleTxt = nodeIndex + ") ";
+			if (isSelected)
+				dNode.name = (EditorGUI.DelayedTextField(new Rect(13, 0, 105, 16), dNode.name));
+			else
+				nodeTitleTxt += dNode.name;
+
+			EditorGUI.LabelField(new Rect(0,0,106,16), nodeTitleTxt);
+
 			if(GUI.Button(new Rect(119,1,8,8), ""))
 			{
 				toggleDragNDrop();
@@ -205,7 +255,7 @@ namespace UDialogue
 
 			// EDITING:
 
-			string contTxt = dNode.content != null && !string.IsNullOrEmpty(dNode.content[0].text) ?
+			string contTxt = dNode.content != null && dNode.content.Length != 0 && !string.IsNullOrEmpty(dNode.content[0].text) ?
 				dNode.content[0].text : "<empty>";
 			EditorGUI.LabelField(new Rect(0,17,106,16), contTxt, EditorStyles.miniLabel);
 			EditorGUI.LabelField(new Rect(0,34,106,16), "Contents: " + dNode.content.Length.ToString());
@@ -220,7 +270,7 @@ namespace UDialogue
 			if(GUI.Button(new Rect(107,51,20,16), "+"))
 			{
 				actions.changed = true;
-				Debug.Log("TODO: add response helper methods");
+				addNodeResponse(dNode);
 			}
 
 			GUI.EndGroup();
@@ -260,12 +310,21 @@ namespace UDialogue
 		private void drawNodeLink(Vector2 p0, Node target)
 		{
 			Vector2 p1 = target.rect.position + Vector2.up * target.rect.height * 0.5f;
-			Vector2 tan = Vector2.right * 32;
+
+			float tanLength = 32 * Mathf.Max(Vector2.Distance(p0, p1) / 74.0f, 1.0f);
+			Vector2 t0 = new Vector2(tanLength,0);
+			Vector2 t1 = new Vector2(-tanLength,0);
+			if (p0.x > p1.x)
+			{
+				float vertTanLength = tanLength * 0.5f;
+				t0.y += vertTanLength;
+				t1.y += vertTanLength;
+			}
 
 			Color c0 = new Color(0.0f, 0.9f, 1.0f);
 			Color c1 = new Color(0.0f, 0.9f, 1.0f, 0.5f);
-			Handles.DrawBezier(p0, p1, p0 + tan, p1 - tan, c0, null, 1);
-			Handles.DrawBezier(p0, p1, p0 + tan, p1 - tan, c1, null, 2);
+			Handles.DrawBezier(p0, p1, p0 + t0, p1 + t1, c0, null, 1);
+			Handles.DrawBezier(p0, p1, p0 + t0, p1 + t1, c1, null, 2);
 		}
 		private Vector2 getResponsePosition(Node node, int responseIndex)
 		{
@@ -276,13 +335,64 @@ namespace UDialogue
 			float basePosY = node.rect.center.y - 0.5f * respSize;
 
 			float x = node.rect.x + node.rect.width+16;
-			float y = basePosY + responseIndex * 17.0f+16;
+			float y = basePosY + responseIndex * 17.0f+15;
 
 			return new Vector2(x, y);
 		}
 
 		#endregion
 		#region Methods Node Helpers
+
+		public static void createNodeList(Dialogue dialogue, ref List<Node> nodes)
+		{
+			// Initialize list if it hasn't been done already:
+			if (nodes == null) nodes = new List<DialogueNodeEditor.Node>();
+			nodes.Clear();
+
+			string assetPath = AssetDatabase.GetAssetPath(dialogue);
+			object[] allAssets = AssetDatabase.LoadAllAssetsAtPath(assetPath);
+			foreach (object asset in allAssets)
+			{
+				DialogueNode dNode = asset as DialogueNode;
+				if (dNode == null) continue;
+				int newRootId = -1;
+				for (int i = 0; i < dialogue.rootNodes.Length; ++i)
+					if (dNode == dialogue.rootNodes[i].node) newRootId = i;
+				DialogueNodeEditor.Node newNode = new DialogueNodeEditor.Node()
+				{ node = dNode, rootId = newRootId, rect = new Rect(100, 100, 128, 64) };
+				nodes.Add(newNode);
+			}
+		}
+		public static bool createNewNode(Dialogue dialogue, ref List<Node> nodes)
+		{
+			// Make sure the dialogue asset is non-null:
+			if (dialogue == null) return false;
+			// Update node list: (initialize list and load existing nodes from dialogue asset)
+			if (nodes == null || nodes.Count == 0) createNodeList(dialogue, ref nodes);
+
+			// Create a new node asset in dialogue:
+			DialogueNode newDNode = DialogueEditorHelper.createNewNode(dialogue);
+			// Create an editor node representation:
+			DialogueNodeEditor.Node newNode = DialogueNodeEditor.Node.Blank;
+			newNode.node = newDNode;
+
+			// Set newly created node as root node if no root has been assigned yet:
+			if (dialogue.rootNodes == null || dialogue.rootNodes.Length == 0)
+			{
+				// Create new root node in dialogue with no conditions:
+				DialogueConditions newRootConds = DialogueConditions.None;
+				DialogueRoot newRoot = new DialogueRoot() { node = newDNode, conditions = newRootConds };
+				dialogue.rootNodes = new DialogueRoot[1] { newRoot };
+				newNode.rootId = 0;
+
+				// Save changes to asset:
+				DialogueEditorHelper.saveDialogueAsset(dialogue);
+			}
+
+			// Add the new node representation to nodes list:
+			nodes.Add(newNode);
+			return true;
+		}
 
 		public static void addNodeContent(DialogueNode node, int index)
 		{
@@ -341,6 +451,45 @@ namespace UDialogue
 			return true;
 		}
 
+		public static bool addNodeResponse(DialogueNode node)
+		{
+			if (node == null) return false;
+
+			DialogueResponse[] oldResponses = node.responses;
+			bool oldWasEmpty = oldResponses == null || oldResponses.Length == 0;
+			int oldResponseCount = oldWasEmpty ? 0 : oldResponses.Length;
+
+			DialogueResponse[] newResponses = new DialogueResponse[oldWasEmpty ? 1 : oldResponseCount + 1];
+			if (!oldWasEmpty)
+			{
+				for (int i = 0; i < oldResponseCount; ++i)
+					newResponses[i] = oldResponses[i];
+			}
+
+			DialogueResponse newResponse = DialogueResponse.Blank;
+			newResponse.responseText = "[...]";
+			newResponses[oldResponseCount] = newResponse;
+			node.responses = newResponses;
+
+			EditorUtility.SetDirty(node);
+			return true;
+		}
+
+		private bool createNodeLink(Node source, int responseIndex, int targetNodeIndex)
+		{
+			DialogueNode dNode = source.node;
+			if (dNode == null) return false;
+			if (dNode.responses == null || responseIndex < 0 || responseIndex >= dNode.responses.Length) return false;
+
+			DialogueNode targetNode = (targetNodeIndex < 0 || targetNodeIndex >= nodes.Count) ? null : nodes[targetNodeIndex].node;
+
+			dNode.responses[responseIndex].nextNode = targetNode;
+
+			EditorUtility.SetDirty(dNode);
+			if(targetNode != null) EditorUtility.SetDirty(targetNode);
+			return true;
+		}
+
 		#endregion
 		#region Methods Layout
 
@@ -370,11 +519,13 @@ namespace UDialogue
 			}
 
 			int currentDepth = 0;
-			List<int> depthCounts = new List<int>();
+			List<List<Node>> depthCounts = new List<List<Node>>();
 			while(currentNodeIndices.Count != 0 && currentDepth < 256)
 			{
 				// NOTE: 256 was set as an arbitrary limit to prevent crashes from loops in dialogue structure.
-				depthCounts.Add(0);
+				List<Node> depthList = new List<Node>();
+				depthCounts.Add(depthList);
+
 				for(int i = 0; i < currentNodeIndices.Count; i++)
 				{
 					int currentIndex = currentNodeIndices[i];
@@ -385,9 +536,14 @@ namespace UDialogue
 						depths[currentIndex] = 255;
 						continue;
 					}
+					// Skip nodes that have already been sorted (for whatever reason):
+					if (depths[currentIndex] >= 0)
+					{
+						continue;
+					}
 
 					depths[currentIndex] = currentDepth;
-					depthCounts[currentDepth] += 1;
+					depthList.Add(node);
 
 					for(int j = 0; j < dNode.responses.Length; ++j)
 					{
@@ -414,7 +570,7 @@ namespace UDialogue
 
 			// Push any disconnected, invalid or new nodes to the very end of the depth spectrum:
 			int maxDepth = depthCounts.Count;
-			depthCounts.Add(0);
+			depthCounts.Add(new List<Node>());
 			foreach(Node n in nodes)
 			{
 				if(n.node == null) continue;
@@ -425,38 +581,91 @@ namespace UDialogue
 				if(nDepth < 0)
 				{
 					depths[nIndex] = maxDepth;
-					depthCounts[maxDepth]++;
+					depthCounts[maxDepth].Add(n);
+				}
+			}
+
+			// Sort nodes vertically, to avoid overly spaghetti-like links:
+			float[] weights = new float[nodes.Count];
+			for (int i = 0; i < weights.Length; ++i)
+				weights[i] = 0.0f;
+			for(int i = 0; i < depthCounts.Count - 1; ++i)
+			{
+				List<Node> depthNodes = depthCounts[i];
+				int[] depthNodeIndices = new int[depthNodes.Count];
+
+				for(int j = 0; j < depthNodes.Count; ++j)
+				{
+					Node node = depthNodes[j];
+					if (node.node == null) continue;
+
+					int sourceIndex;
+					nodeIndices.TryGetValue(node.node, out sourceIndex);
+					depthNodeIndices[j] = sourceIndex;
+					float sourceWeight = weights[sourceIndex];
+
+					for (int k = 0; k < node.node.responses.Length; ++k)
+					{
+						// Calculate weighting based on precursing nodes' weight and the responses' indices:
+						float weight = sourceWeight * 1.317f + k;	// note: odd multiplier value makes identical weightings less likely.
+
+						DialogueResponse resp = node.node.responses[k];
+						if (resp.nextNode == null) continue;
+
+						int targetIndex;
+						if (!nodeIndices.TryGetValue(resp.nextNode, out targetIndex)) continue;
+						weights[targetIndex] += weight;
+					}
+				}
+
+				// Sort nodes on a same depth based on their cumulative weighting:
+				float lowestWeight = 1.0e+8f;
+				for (int j = 0; j < depthNodes.Count; ++j)
+				{
+					for (int k = j; k < depthNodes.Count; ++k)
+					{
+						int sourceIndex = depthNodeIndices[k];
+						float kWeight = weights[sourceIndex];
+						if (kWeight < lowestWeight)
+						{
+							Node jNode = depthNodes[j];
+							depthNodes[j] = depthNodes[k];
+							depthNodes[k] = jNode;
+
+							lowestWeight = kWeight;
+						}
+					}
 				}
 			}
 
 			// Calculate screen positions for all nodes:
-			int[] depthCountsDone = new int[depthCounts.Count];
-			for(int i = 0; i < nodes.Count; ++i)
+			//int[] depthCountsDone = new int[depthCounts.Count];
+			for (int i = 0; i < nodes.Count; ++i)
 			{
 				const float nodeOffsetX = 32;
 				const float nodeOffsetY0 = 10;
 				const float nodeHeight0 = 70;
 				float nodeOffsetY = nodeOffsetY0 + (Screen.height - nodeHeight0) * 0.5f;
 
-				const float nodeWidth = 130 + 64 + 31;
-				const float nodeHeight = nodeHeight0 + 10;
+				const float nodeWidth = 130 + 64 + 36;
+				const float nodeHeight = nodeHeight0 + 18;
 
 				Node node = nodes[i];
 				int nIndex;
-				if(!nodeIndices.TryGetValue(node.node, out nIndex)) continue;
+				if (!nodeIndices.TryGetValue(node.node, out nIndex)) continue;
 
 				int nDepth = depths[nIndex];
-				int nDepthCountAll = depthCounts[Mathf.Clamp(nDepth, 0, maxDepth)];
-				int nDepthCount = depthCountsDone[nDepth];
+				List<Node> depthNodes = depthCounts[nDepth];
+				int nDepthIndex = depthNodes.IndexOf(node);
 
-				float countOffset = -0.5f * (nDepthCountAll - 1) + nDepthCount;
+				float countOffset = -0.5f * (depthNodes.Count - 1) + nDepthIndex;
 				float posX = nodeOffsetX + nDepth * nodeWidth;
 				float posY = nodeOffsetY + countOffset * nodeHeight;
 
 				node.rect = new Rect(posX, posY, 130, 70);
 				nodes[i] = node;
 
-				depthCountsDone[nDepth]++;
+				//depthCountsDone[nDepth]++;
 			}
 		}
 
