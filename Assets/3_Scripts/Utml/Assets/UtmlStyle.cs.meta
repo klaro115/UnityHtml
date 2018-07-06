@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: 25a08dccfc2c344ef80ca42b41d54336
+timeCreated: 1527865370
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - buttonPrefab: {fileID: 114635400734373290, guid: fc06a94ae6fc548d984220a657e51aaa,
+      type: 2}
+  - togglePrefab: {fileID: 114774865289795312, guid: 8e36aa87d035b413cae21e3deb075fb3,
+      type: 2}
+  - inputPrefab: {fileID: 114275149063671814, guid: 92490810de6694df9b54af3a25d4f7f4,
+      type: 2}
+  - paragraphPrefab: {fileID: 114743748557526192, guid: e0f3cfee3981c4fa69dfda5fd7b30c91,
+      type: 2}
+  - imagePrefab: {fileID: 114786941788709284, guid: 14879db541cbe4604ab93ccf10ac8b58,
+      type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
