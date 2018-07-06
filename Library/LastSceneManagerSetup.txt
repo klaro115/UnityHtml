@@ -1,0 +1,4 @@
+sceneSetups:
+- path: Assets/0_Scenes/UDialogue/DemoDialogue.unity
+  isLoaded: 1
+  isActive: 1
