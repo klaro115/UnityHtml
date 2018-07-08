@@ -26,6 +26,7 @@ namespace UDialogue
 		{
 			public bool changed;
 			public bool selected;
+			public bool startDragDrop;
 		}
 
 		#endregion
@@ -158,7 +159,7 @@ namespace UDialogue
 
 					bool isSelected = selected.node == node.node;
 					// Update drag&drop:
-					NodeAction actions = new NodeAction() { changed=false, selected=false };
+					NodeAction actions = new NodeAction() { changed=false, selected=false, startDragDrop=false };
 					if(isSelected && dragNDrop)
 					{
 						Vector2 mousePos = Event.current.mousePosition;
@@ -183,6 +184,11 @@ namespace UDialogue
 					if(actions.selected)
 					{
 						setSelection(node);
+					}
+					// Start drag&drop of the node if a related action was performed:
+					if(actions.startDragDrop)
+					{
+						toggleDragNDrop();
 					}
 				}
 
@@ -268,6 +274,7 @@ namespace UDialogue
 
 			// HEADER:
 
+			// Display editor ID and name of the node:
 			string nodeTitleTxt = nodeIndex + ") ";
 			if (isSelected)
 				dNode.name = (EditorGUI.DelayedTextField(new Rect(13, 0, 105, 16), dNode.name));
@@ -276,9 +283,10 @@ namespace UDialogue
 
 			EditorGUI.LabelField(new Rect(0,0,106,16), nodeTitleTxt);
 
+			// Draw a tiny drag&drop button at the top right:
 			if(GUI.Button(new Rect(119,1,8,8), ""))
 			{
-				toggleDragNDrop();
+				actions.startDragDrop = true;
 				actions.selected = true;
 			}
 
@@ -290,12 +298,15 @@ namespace UDialogue
 			EditorGUI.LabelField(new Rect(0,34,106,16), "Contents: " + dNode.content.Length.ToString());
 			EditorGUI.LabelField(new Rect(0,51,106,16), "Responses: " + dNode.responses.Length.ToString());
 
+			// Button to select a node for content editing:
 			if(GUI.Button(new Rect(107,17,20,16), ">")) actions.selected = true;
+			// Button for adding content items:
 			if(GUI.Button(new Rect(107,34,20,16), "+"))
 			{
 				actions.changed = true;
 				addNodeContent(dNode, dNode.content.Length);
 			}
+			// Button for adding responses:
 			if(GUI.Button(new Rect(107,51,20,16), "+"))
 			{
 				actions.changed = true;
@@ -304,6 +315,7 @@ namespace UDialogue
 
 			GUI.EndGroup();
 
+			// Draw buttons for each response in a column directly to the right of the node itself:
 			if(dNode.responses != null)
 			{
 				int respCount = dNode.responses.Length;

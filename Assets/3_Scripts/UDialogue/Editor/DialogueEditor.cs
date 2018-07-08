@@ -28,6 +28,8 @@ namespace UDialogue
 		private List<DialogueNodeEditor.Node> nodes = null;
 		private int selectedNodeIndex = -1;
 
+		private string findNodeTxt = "Find node by name";
+
 		[SerializeField]
 		private DialogueNodeEditor nodeEditor = null;
 		private System.Diagnostics.Stopwatch stopwatch = null;
@@ -165,12 +167,45 @@ namespace UDialogue
 				assetChanged = assetChanged || nodeEditor.drawNodes(nodes, scrollPosition);
 			}
 
-			// Draw navigation buttons at the top left of the work space:
-			if (GUI.RepeatButton(new Rect(10, 30, 20, 20), "L")) scrollPosition.x -= 10.0f;
-			if (GUI.RepeatButton(new Rect(50, 30, 20, 20), "R")) scrollPosition.x += 10.0f;
-			if (GUI.RepeatButton(new Rect(30, 10, 20, 20), "D")) scrollPosition.y -= 10.0f;
-			if (GUI.RepeatButton(new Rect(30, 50, 20, 20), "U")) scrollPosition.y += 10.0f;
-			if (GUI.RepeatButton(new Rect(30, 30, 20, 20), "O")) scrollPosition = Vector2.zero;
+			// Navigation elements:
+			{
+				Rect navRect = new Rect(10, 10, 200, 70);
+				GUI.BeginGroup(navRect);
+				EditorGUI.DrawRect(new Rect(0, 0, navRect.width, navRect.height), Color.black);
+				EditorGUI.DrawRect(new Rect(1, 1, navRect.width-2, navRect.height-2), new Color(0.75f, 0.75f, 0.75f));
+
+				// Draw navigation buttons at the top left of the work space:
+				if (GUI.RepeatButton(new Rect(5, 25, 20, 20), "L")) scrollPosition.x -= 10.0f;
+				if (GUI.RepeatButton(new Rect(45, 25, 20, 20), "R")) scrollPosition.x += 10.0f;
+				if (GUI.RepeatButton(new Rect(25, 5, 20, 20), "D")) scrollPosition.y -= 10.0f;
+				if (GUI.RepeatButton(new Rect(25, 45, 20, 20), "U")) scrollPosition.y += 10.0f;
+				if (GUI.RepeatButton(new Rect(25, 25, 20, 20), "O")) scrollPosition = Vector2.zero;
+
+				findNodeTxt = EditorGUI.TextField(new Rect(70, 5, 85, 16), findNodeTxt);
+				if(GUI.Button(new Rect(156, 5, 39, 16), "Find") && !string.IsNullOrEmpty(findNodeTxt))
+				{
+					int findNodeIndex = -1;
+					try
+					{
+						findNodeIndex = System.Convert.ToInt32(findNodeTxt);
+					}
+					catch (System.Exception) { }
+					for(int i = 0; i < nodes.Count; ++i)
+					{
+						DialogueNodeEditor.Node fNode = nodes[i];
+						DialogueNode fdNode = fNode.node;
+						if (fdNode == null) continue;
+						if(i == findNodeIndex || fdNode.name.Contains(findNodeTxt))
+						{
+							selectNode(i);
+							centerSelected();
+							break;
+						}
+					}
+				}
+
+				GUI.EndGroup();
+			}
 
 			GUI.EndClip();
 			GUI.EndGroup();
@@ -190,6 +225,16 @@ namespace UDialogue
 
 			//Reset flags:
 			assetChanged = false;
+		}
+
+		public void centerSelected()
+		{
+			if (nodes == null || selectedNodeIndex < 0 || selectedNodeIndex >= nodes.Count) return;
+
+			DialogueNodeEditor.Node node = nodes[selectedNodeIndex];
+			Rect nodeRect = node.rect;
+			Vector2 nodePos = nodeRect.center;
+			scrollPosition = nodePos - new Vector2(Screen.width, Screen.height) * 0.5f;
 		}
 
 		#endregion
