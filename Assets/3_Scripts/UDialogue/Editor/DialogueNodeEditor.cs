@@ -33,6 +33,7 @@ namespace UDialogue
 
 		private Node selected = Node.Blank;
 		private List<Node> nodes = null;
+		private Vector2 offset = Vector2.zero;
 
 		private bool dragNDrop = false;
 		private int selectedResponse = -1;
@@ -82,12 +83,20 @@ namespace UDialogue
 			responseTargetNodeId = -1;	//<<<todo
 		}
 
-		public bool drawNodes(List<Node> inNodes)
+		public bool drawNodes(List<Node> inNodes, Vector2 inOffet)
 		{
+			offset = inOffet;
+
 			bool changed = false;
 			nodes = inNodes;
 
-			if(nodes != null && nodes.Count != 0)
+			Vector2 rootPos = new Vector2(0, Screen.height * 0.5f);
+			Rect rootRect = new Rect(rootPos.x - offset.x - 39, rootPos.y - offset.y - 7, 38, 14);
+			EditorGUI.DrawRect(new Rect(rootRect.x-1, rootRect.y-1, rootRect.width+2, rootRect.height+2), Color.black);
+			EditorGUI.DrawRect(rootRect, new Color(0.75f, 0.75f, 0.75f));
+			EditorGUI.LabelField(rootRect, "Root");
+
+			if (nodes != null && nodes.Count != 0)
 			{
 				// Draw links between nodes first:
 				for(int i = 0; i < nodes.Count; ++i)
@@ -98,7 +107,7 @@ namespace UDialogue
 					// Links from dialogue root:
 					if(node.rootId >= 0)
 					{
-						drawNodeLink(new Vector2(0, Screen.height*.5f), node);
+						drawNodeLink(rootPos, node);
 					}
 
 					// Links to response nodes:
@@ -108,13 +117,17 @@ namespace UDialogue
 						{
 							DialogueResponse resp = dNode.responses[j];
 							Vector2 respPos = getResponsePosition(node, j);
+
+							// Draw short red lines to indicate a response is no linked to any node:
 							if (resp.nextNode == null)
 							{
+								respPos -= offset;
 								Handles.color = Color.red;
 								Handles.DrawLine(respPos, respPos + Vector2.right * 32);
 								continue;
 							}
 
+							// Figure out the editor node representing the response's connected node asset:
 							Node targetNode = Node.Blank;
 							foreach(Node n in nodes)
 							{
@@ -125,6 +138,7 @@ namespace UDialogue
 								}
 							}
 							
+							// Draw a bezier curve starting at the response button and leading to the connected node:
 							drawNodeLink(respPos, targetNode);
 						}
 					}
@@ -180,7 +194,7 @@ namespace UDialogue
 
 					Rect respRect = respNode.rect;
 					float respPosY = respRect.y+34 + (-respDNode.responses.Length*.5f + selectedResponse) * 17;
-					respRect = new Rect(respRect.x+138,respPosY,122,57);
+					respRect = new Rect(respRect.x-offset.x+138,respPosY-offset.y,122,57);
 
 					GUI.BeginGroup(respRect);
 
@@ -202,13 +216,19 @@ namespace UDialogue
 							}
 						}
 					}
-					EditorGUI.BeginDisabledGroup(selected.node.responses != null && selected.node.responses[selectedResponse].nextNode == null);
+
+					bool uiShowClearLink = selected.node.responses != null &&
+						selectedResponse >= 0 &&
+						selectedResponse < selected.node.responses.Length &&
+						selected.node.responses[selectedResponse].nextNode == null;
+					EditorGUI.BeginDisabledGroup(uiShowClearLink);
 					if (GUI.Button(new Rect(2, 20, 118, 16), "Clear Link"))
 					{
 						Debug.Log("Resetting response " + selectedResponse + " in selected node.");
 						createNodeLink(respNode, selectedResponse, -1);
 					}
 					EditorGUI.EndDisabledGroup();
+
 					if (GUI.Button(new Rect(2,38,88,16), "Link to ID"))
 					{
 						if(createNodeLink(respNode, selectedResponse, responseTargetNodeId))
@@ -230,8 +250,17 @@ namespace UDialogue
 			bool prevChanged = GUI.changed;
 			GUI.changed = false;
 
-			EditorGUI.DrawRect(new Rect(node.rect.x-1,node.rect.y-1,130,70), Color.black);
-			GUI.BeginGroup(new Rect(node.rect));
+			const float nodeHeight = 70;
+			Rect nRect = node.rect;
+			nRect.position -= offset;
+
+			// Draw incoming link endpoint:
+			EditorGUI.DrawRect(new Rect(nRect.x - 4, nRect.y + nodeHeight * 0.5f - 2, 4, 5), Color.black);
+			// Draw black outline:
+			EditorGUI.DrawRect(new Rect(nRect.x-1, nRect.y-1,130,nodeHeight), Color.black);
+
+			// Draw content rect:
+			GUI.BeginGroup(new Rect(nRect));
 			EditorGUI.DrawRect(new Rect(0,0,128,68), new Color(0.75f,0.75f,0.75f));
 			EditorGUI.DrawRect(new Rect(0,15,128,1), Color.black);
 			
@@ -279,7 +308,7 @@ namespace UDialogue
 			{
 				int respCount = dNode.responses.Length;
 				float respSize = respCount * 17.0f;
-				Rect respRect = new Rect(node.rect.x+129, node.rect.y+34-respSize*.5f, 100, respSize);
+				Rect respRect = new Rect(nRect.x+129, nRect.y+34-respSize*.5f, 100, respSize);
 
 				GUI.BeginGroup(respRect);
 				for(int i = 0; i < respCount; ++i)
@@ -309,14 +338,15 @@ namespace UDialogue
 
 		private void drawNodeLink(Vector2 p0, Node target)
 		{
-			Vector2 p1 = target.rect.position + Vector2.up * target.rect.height * 0.5f;
+			p0 -= offset;
+			Vector2 p1 = target.rect.position + Vector2.up * target.rect.height * 0.5f - offset;
 
 			float tanLength = 32 * Mathf.Max(Vector2.Distance(p0, p1) / 74.0f, 1.0f);
-			Vector2 t0 = new Vector2(tanLength,0);
-			Vector2 t1 = new Vector2(-tanLength,0);
+			Vector2 t0 = new Vector2(tanLength, 0);
+			Vector2 t1 = new Vector2(-tanLength, 0);
 			if (p0.x > p1.x)
 			{
-				float vertTanLength = tanLength * 0.5f;
+				float vertTanLength = tanLength * 0.45f;
 				t0.y += vertTanLength;
 				t1.y += vertTanLength;
 			}
@@ -326,15 +356,19 @@ namespace UDialogue
 			Handles.DrawBezier(p0, p1, p0 + t0, p1 + t1, c0, null, 1);
 			Handles.DrawBezier(p0, p1, p0 + t0, p1 + t1, c1, null, 2);
 		}
+
 		private Vector2 getResponsePosition(Node node, int responseIndex)
 		{
-			if(node.node == null || node.node.responses == null) return node.rect.center;
+			Rect nRect = node.rect;
+			//nRect.position -= offset;
+
+			if(node.node == null || node.node.responses == null) return nRect.center;
 
 			int respCount = node.node.responses.Length;
 			float respSize = (respCount + 1) * 17.0f;
-			float basePosY = node.rect.center.y - 0.5f * respSize;
+			float basePosY = nRect.center.y - 0.5f * respSize;
 
-			float x = node.rect.x + node.rect.width+16;
+			float x = nRect.x + nRect.width+16;
 			float y = basePosY + responseIndex * 17.0f+15;
 
 			return new Vector2(x, y);
@@ -647,7 +681,7 @@ namespace UDialogue
 				const float nodeHeight0 = 70;
 				float nodeOffsetY = nodeOffsetY0 + (Screen.height - nodeHeight0) * 0.5f;
 
-				const float nodeWidth = 130 + 64 + 36;
+				const float nodeWidth = 130 + 64 + 40;
 				const float nodeHeight = nodeHeight0 + 18;
 
 				Node node = nodes[i];

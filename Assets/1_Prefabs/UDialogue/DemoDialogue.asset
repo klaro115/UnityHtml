@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Name: DemoDialogue
   m_EditorClassIdentifier: 
   characters:
-  - name: Character
+  - name: Old Man
   startBinding:
     path: 
     type: 0
@@ -36,7 +36,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
-  m_Name: 4 Job Lost
+  m_Name: Job Lost
   m_EditorClassIdentifier: 
   content:
   - speakerId: 0
@@ -62,7 +62,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
-  m_Name: 0 Greeting
+  m_Name: Greeting
   m_EditorClassIdentifier: 
   content:
   - speakerId: 0
@@ -77,6 +77,8 @@ MonoBehaviour:
   responses:
   - responseText: How's it going?
     nextNode: {fileID: 114295821561744242}
+  - responseText: What are the news?
+    nextNode: {fileID: 114577768023057506}
   - responseText: '[Leave]'
     nextNode: {fileID: 0}
 --- !u!114 &114295821561744242
@@ -88,7 +90,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
-  m_Name: 1 PessimistRant
+  m_Name: PessimistRant
   m_EditorClassIdentifier: 
   content:
   - speakerId: 0
@@ -116,7 +118,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
-  m_Name: 2 Spiteful
+  m_Name: Spiteful
   m_EditorClassIdentifier: 
   content:
   - speakerId: 0
@@ -142,7 +144,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
-  m_Name: 3 Compassionate
+  m_Name: Compassionate
   m_EditorClassIdentifier: 
   content:
   - speakerId: 0
@@ -168,7 +170,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
-  m_Name: 5 Start Battle
+  m_Name: Start Battle
   m_EditorClassIdentifier: 
   content:
   - speakerId: 0
@@ -185,6 +187,74 @@ MonoBehaviour:
     nextNode: {fileID: 0}
   - responseText: Wait. Shouldn't you be going to work now?
     nextNode: {fileID: 114177795553884494}
+--- !u!114 &114577768023057506
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
+  m_Name: WorldIsTerrible
+  m_EditorClassIdentifier: 
+  content:
+  - speakerId: 0
+    text: As you can imagine, the world's going insane.
+    timeout: -1
+    eventBinding:
+      path: 
+      type: 0
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  responses:
+  - responseText: What leads you to say this?
+    nextNode: {fileID: 114988443489717490}
+--- !u!114 &114652429489560448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
+  m_Name: Hookup
+  m_EditorClassIdentifier: 
+  content:
+  - speakerId: 0
+    text: Hey, um...
+    timeout: -1
+    eventBinding:
+      path: 
+      type: 0
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  - speakerId: 0
+    text: I don't know if you've heard already, but...
+    timeout: -1
+    eventBinding:
+      path: 
+      type: 0
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  - speakerId: 0
+    text: Ya know, I kind of hooked up with your sister.
+    timeout: -1
+    eventBinding:
+      path: 
+      type: 0
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  responses:
+  - responseText: You did what!? [Fight]
+    nextNode: {fileID: 0}
+  - responseText: Eh, shit happens. [Leave]
+    nextNode: {fileID: 0}
 --- !u!114 &114741023516838926
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -194,7 +264,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
-  m_Name: 6 Romance
+  m_Name: Romance
   m_EditorClassIdentifier: 
   content:
   - speakerId: 0
@@ -209,3 +279,39 @@ MonoBehaviour:
   responses:
   - responseText: '[Run]'
     nextNode: {fileID: 0}
+--- !u!114 &114988443489717490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
+  m_Name: OldManRant
+  m_EditorClassIdentifier: 
+  content:
+  - speakerId: 0
+    text: Oh, you know how it is. When you're young, you just assume that everything
+      will just magically fall into place...
+    timeout: -1
+    eventBinding:
+      path: 
+      type: 0
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  - speakerId: 0
+    text: But then, suddenly, you're old and none of your dreams have come true.
+    timeout: -1
+    eventBinding:
+      path: 
+      type: 0
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  responses:
+  - responseText: Yeah, but you did get to work your dream job, right?
+    nextNode: {fileID: 114177795553884494}
+  - responseText: '[Try to leave]'
+    nextNode: {fileID: 114652429489560448}

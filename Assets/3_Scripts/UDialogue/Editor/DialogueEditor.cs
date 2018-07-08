@@ -23,9 +23,7 @@ namespace UDialogue
 		public Dialogue dialogue = null;
 		private bool assetChanged = false;
 
-//		private Vector2 scrollPosition = Vector2.zero;
-
-		//...
+		private Vector2 scrollPosition = Vector2.zero;
 
 		private List<DialogueNodeEditor.Node> nodes = null;
 		private int selectedNodeIndex = -1;
@@ -164,8 +162,15 @@ namespace UDialogue
 			// Draw existing nodes in their relative positions here with all their dependencies.
 			if(dialogue != null && nodes != null)
 			{
-				assetChanged = assetChanged || nodeEditor.drawNodes(nodes);
+				assetChanged = assetChanged || nodeEditor.drawNodes(nodes, scrollPosition);
 			}
+
+			// Draw navigation buttons at the top left of the work space:
+			if (GUI.RepeatButton(new Rect(10, 30, 20, 20), "L")) scrollPosition.x -= 10.0f;
+			if (GUI.RepeatButton(new Rect(50, 30, 20, 20), "R")) scrollPosition.x += 10.0f;
+			if (GUI.RepeatButton(new Rect(30, 10, 20, 20), "D")) scrollPosition.y -= 10.0f;
+			if (GUI.RepeatButton(new Rect(30, 50, 20, 20), "U")) scrollPosition.y += 10.0f;
+			if (GUI.RepeatButton(new Rect(30, 30, 20, 20), "O")) scrollPosition = Vector2.zero;
 
 			GUI.EndClip();
 			GUI.EndGroup();
