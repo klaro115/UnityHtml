@@ -17,6 +17,7 @@ namespace UDialogue
 
 		private DialogueNode currentNode = null;
 		private int currentContentIndex = 0;
+		private List<DialogueResponse> currentResponses = null;
 
 
 		private static readonly DialogueResponse[] fallbackResponses = new DialogueResponse[1] { DialogueResponse.Blank };
@@ -65,6 +66,8 @@ namespace UDialogue
 		{
 			currentNode = null;
 			currentContentIndex = 0;
+			if (currentResponses == null) currentResponses = new List<DialogueResponse>();
+			currentResponses.Clear();
 		}
 
 		public DialogueContent getCurrentContent()
@@ -74,22 +77,19 @@ namespace UDialogue
 			currentContentIndex = Mathf.Clamp(currentContentIndex, 0, currentNode.content.Length);
 			return currentNode.content[currentContentIndex];
 		}
+
 		public DialogueResponse[] getCurrentResponses()
 		{
 			if (currentNode == null) return fallbackResponses;
 
 			// Only offer to proceed to the next content, if there are 1 or more content items remaining:
-			if(currentContentIndex < currentNode.content.Length - 1)
+			if(currentContentIndex < currentNode.content.Length - 1 || currentResponses.Count == 0)
 			{
 				return nextContentResponses;
 			}
-			// If there's only one content item or we've reached to final one, present actual response options:
-			else
-			{
-				return currentNode.responses;
-			}
 
-			// TODO: Only return responses whose conditions have been met!!!
+			// If there's only one content item or we've reached to final one, present actual response options:
+			return currentResponses.ToArray();
 		}
 
 		public bool startDialogue()
@@ -212,6 +212,16 @@ namespace UDialogue
 				{
 					Debug.LogError("[DialogueController] An error was encountered while trying to resolve a node's first binding!\nError type: " + result.error.ToString());
 				}
+			}
+
+			// Load the node's responses and extract those whose conditions have been met already:
+			DialogueResponse[] allResponses = CurrentNode.responses;
+			currentResponses.Clear();
+			for(int i = 0; i < allResponses.Length; ++i)
+			{
+				DialogueResponse resp = allResponses[i];
+				if (string.IsNullOrEmpty(resp.conditions.keyword)) currentResponses.Add(resp);
+				else if (trigger != null && trigger.checkDialogueCondition(ref resp.conditions)) currentResponses.Add(resp);
 			}
 
 			return true;

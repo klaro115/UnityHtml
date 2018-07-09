@@ -13,6 +13,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characters:
   - name: Old Man
+  - name: You
   startBinding:
     path: 
     type: 0
@@ -27,9 +28,9 @@ MonoBehaviour:
     eventString: 
   rootNodes:
   - conditions:
-      keyword: flag:Romance
+      keyword: 
       comparision: 1
-      targetState: 1
+      targetState: 0
       relatedObject: {fileID: 0}
     node: {fileID: 114218101850340150}
   - conditions:
@@ -38,6 +39,65 @@ MonoBehaviour:
       targetState: 1
       relatedObject: {fileID: 0}
     node: {fileID: 114896184322458160}
+  - conditions:
+      keyword: flag:Hostile
+      comparision: 0
+      targetState: 1
+      relatedObject: {fileID: 0}
+    node: {fileID: 114717801257888776}
+  - conditions:
+      keyword: flag:Quest
+      comparision: 0
+      targetState: 1
+      relatedObject: {fileID: 0}
+    node: {fileID: 114857192846166026}
+--- !u!114 &114114362475079458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
+  m_Name: QuestInfo
+  m_EditorClassIdentifier: 
+  content:
+  - speakerId: 0
+    text: By the way, your sister was abducted by some weirdo.
+    timeout: -1
+    eventBinding:
+      path: :raiseFlag
+      type: 0
+      responseCode: 1
+      eventValue: 1
+      eventString: Quest
+  - speakerId: 1
+    text: '... Why didn''t you tell me that earlier!?'
+    timeout: -1
+    eventBinding:
+      path: 
+      type: 0
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  - speakerId: 0
+    text: It kind of slipped my mind :P
+    timeout: -1
+    eventBinding:
+      path: 
+      type: 0
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  responses:
+  - responseText: We'll just have to save her then.
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 0}
 --- !u!114 &114177795553884494
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -111,6 +171,44 @@ MonoBehaviour:
       relatedObject: {fileID: 0}
     nextNode: {fileID: 114577768023057506}
   - responseText: '[Leave]'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 0}
+--- !u!114 &114290457965486332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
+  m_Name: QuestDetails
+  m_EditorClassIdentifier: 
+  content:
+  - speakerId: 0
+    text: Oh, did I seriously forgot to mention?
+    timeout: -1
+    eventBinding:
+      path: 
+      type: 0
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  - speakerId: 0
+    text: Oh, but it's not too bad. There will be some radioactive mutants though...
+    timeout: -1
+    eventBinding:
+      path: 
+      type: 0
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  responses:
+  - responseText: '[Sneak away]'
     conditions:
       keyword: 
       comparision: 0
@@ -196,6 +294,35 @@ MonoBehaviour:
       targetState: 0
       relatedObject: {fileID: 0}
     nextNode: {fileID: 0}
+--- !u!114 &114321000828773970
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
+  m_Name: Romance2
+  m_EditorClassIdentifier: 
+  content:
+  - speakerId: 0
+    text: Oh, I can't wait, my darling ;)
+    timeout: -1
+    eventBinding:
+      path: :raiseFlag
+      type: 0
+      responseCode: 1
+      eventValue: 1
+      eventString: Romance2
+  responses:
+  - responseText: '[Leave]'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 0}
 --- !u!114 &114355330719392628
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -225,13 +352,13 @@ MonoBehaviour:
       targetState: 0
       relatedObject: {fileID: 0}
     nextNode: {fileID: 114741023516838926}
-  - responseText: '[Leave]'
+  - responseText: '[to self] Aren''t I the most caring person alive?'
     conditions:
       keyword: 
       comparision: 0
       targetState: 0
       relatedObject: {fileID: 0}
-    nextNode: {fileID: 0}
+    nextNode: {fileID: 114486774503494740}
 --- !u!114 &114454049409595624
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -268,6 +395,42 @@ MonoBehaviour:
       targetState: 0
       relatedObject: {fileID: 0}
     nextNode: {fileID: 114177795553884494}
+--- !u!114 &114486774503494740
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
+  m_Name: YourOwnHype
+  m_EditorClassIdentifier: 
+  content:
+  - speakerId: 0
+    text: Wow, do you really believe that much in your own hype?
+    timeout: -1
+    eventBinding:
+      path: :raiseFlag
+      type: 0
+      responseCode: 1
+      eventValue: 1
+      eventString: Hostile
+  responses:
+  - responseText: Got a problem with that?
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 114652240191170260}
+  - responseText: I am the hype!
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 114696341948241706}
 --- !u!114 &114577768023057506
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -297,6 +460,53 @@ MonoBehaviour:
       targetState: 0
       relatedObject: {fileID: 0}
     nextNode: {fileID: 114988443489717490}
+--- !u!114 &114652240191170260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
+  m_Name: HypeBattle
+  m_EditorClassIdentifier: 
+  content:
+  - speakerId: 0
+    text: So? What if I did?
+    timeout: -1
+    eventBinding:
+      path: 
+      type: 0
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  - speakerId: 1
+    text: Oh? You really wanna do this?
+    timeout: -1
+    eventBinding:
+      path: 
+      type: 0
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  - speakerId: 0
+    text: Bring it!
+    timeout: -1
+    eventBinding:
+      path: 
+      type: 0
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  responses:
+  - responseText: '[Fight]'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 0}
 --- !u!114 &114652429489560448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -350,6 +560,64 @@ MonoBehaviour:
       comparision: 0
       targetState: 0
       relatedObject: {fileID: 0}
+    nextNode: {fileID: 114114362475079458}
+--- !u!114 &114696341948241706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
+  m_Name: HypeDoubt
+  m_EditorClassIdentifier: 
+  content:
+  - speakerId: 0
+    text: Yeah, right.
+    timeout: -1
+    eventBinding:
+      path: 
+      type: 0
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  responses:
+  - responseText: '[Prance away]'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 0}
+--- !u!114 &114717801257888776
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
+  m_Name: HostileGreeting
+  m_EditorClassIdentifier: 
+  content:
+  - speakerId: 0
+    text: What do you want? Buzz off!
+    timeout: -1
+    eventBinding:
+      path: 
+      type: 0
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  responses:
+  - responseText: '[Buzz off]'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
     nextNode: {fileID: 0}
 --- !u!114 &114741023516838926
 MonoBehaviour:
@@ -373,7 +641,50 @@ MonoBehaviour:
       eventValue: 1
       eventString: Romance
   responses:
+  - responseText: Sure, let's do this.
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 114321000828773970}
   - responseText: '[Run]'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 0}
+--- !u!114 &114857192846166026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
+  m_Name: QuestStart
+  m_EditorClassIdentifier: 
+  content:
+  - speakerId: 0
+    text: Ready to go and save your sister from the evil sorcerer?
+    timeout: -1
+    eventBinding:
+      path: 
+      type: 0
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  responses:
+  - responseText: Wait. You never mentioned the sorcerer!
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 114290457965486332}
+  - responseText: Yes, let's go! [Leave]
     conditions:
       keyword: 
       comparision: 0
@@ -411,7 +722,52 @@ MonoBehaviour:
       eventValue: 0
       eventString: 
   responses:
+  - responseText: Why don't we continue where we left off earlier?
+    conditions:
+      keyword: flag:Romance2
+      comparision: 0
+      targetState: 1
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 114901429373010774}
   - responseText: '[Run]'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 0}
+--- !u!114 &114901429373010774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
+  m_Name: RomanceContinued
+  m_EditorClassIdentifier: 
+  content:
+  - speakerId: 0
+    text: Well, aren't you a cute one.
+    timeout: -1
+    eventBinding:
+      path: 
+      type: 0
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  - speakerId: 0
+    text: I believe we shouldn't rush it though.
+    timeout: -1
+    eventBinding:
+      path: 
+      type: 0
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  responses:
+  - responseText: '[Leave for now]'
     conditions:
       keyword: 
       comparision: 0

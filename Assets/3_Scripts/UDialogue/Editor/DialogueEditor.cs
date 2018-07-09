@@ -29,6 +29,7 @@ namespace UDialogue
 		private int selectedNodeIndex = -1;
 
 		private string findNodeTxt = "Find node by name";
+		private Vector2 findPos = Vector2.zero;
 
 		[SerializeField]
 		private DialogueNodeEditor nodeEditor = null;
@@ -129,8 +130,11 @@ namespace UDialogue
 				if(GUILayout.Button("New Node"))
 				{
 					// Create new node and select it right away:
-					if(DialogueNodeEditor.createNewNode(dialogue, ref nodes))
+					if(nodeEditor.createNewNode(dialogue, ref nodes))
+					{
 						selectNode(nodes.Count - 1);
+						Repaint();
+					}
 				}
 				EditorGUI.BeginDisabledGroup(nodeEditor.Selected.node == null);
 				if(GUILayout.Button("Delete Node"))
@@ -203,6 +207,13 @@ namespace UDialogue
 						}
 					}
 				}
+				findPos.x = EditorGUI.FloatField(new Rect(70, 22, 42, 16), findPos.x);
+				findPos.y = EditorGUI.FloatField(new Rect(113, 22, 42, 16), findPos.y);
+				if (GUI.Button(new Rect(156, 22, 39, 16), "Goto"))
+				{
+					scrollPosition.x = Mathf.Round(findPos.x - Screen.width * 0.5f);
+					scrollPosition.y = Mathf.Round(findPos.y - Screen.height * 0.5f);
+				}
 
 				GUI.EndGroup();
 			}
@@ -271,6 +282,8 @@ namespace UDialogue
 			// Remove all marked nodes from list:
 			nodes.RemoveAll(o => o.node == null);
 
+			Repaint();
+
 			// Destroy node asset in dialogue:
 			return DialogueEditorHelper.destroyNodeAsset(dNode);
 		}
@@ -293,6 +306,8 @@ namespace UDialogue
 
 			// Add to nodes list and return success:
 			nodes.Add(newNode);
+
+			Repaint();
 			return true;
 		}
 

@@ -163,8 +163,8 @@ namespace UDialogue
 					if(isSelected && dragNDrop)
 					{
 						Vector2 mousePos = Event.current.mousePosition;
-						node.rect.x = mousePos.x - 123;
-						node.rect.y = mousePos.y - 5;
+						node.rect.x = mousePos.x - 123 + offset.x;
+						node.rect.y = mousePos.y - 5 + offset.y;
 						actions.changed = true;
 					}
 
@@ -277,7 +277,7 @@ namespace UDialogue
 			// Display editor ID and name of the node:
 			string nodeTitleTxt = nodeIndex + ") ";
 			if (isSelected)
-				dNode.name = (EditorGUI.DelayedTextField(new Rect(13, 0, 105, 16), dNode.name));
+				dNode.name = (EditorGUI.DelayedTextField(new Rect(20, 0, 98, 16), dNode.name));
 			else
 				nodeTitleTxt += dNode.name;
 
@@ -409,7 +409,7 @@ namespace UDialogue
 				nodes.Add(newNode);
 			}
 		}
-		public static bool createNewNode(Dialogue dialogue, ref List<Node> nodes)
+		public bool createNewNode(Dialogue dialogue, ref List<Node> nodes)
 		{
 			// Make sure the dialogue asset is non-null:
 			if (dialogue == null) return false;
@@ -419,7 +419,7 @@ namespace UDialogue
 			// Create a new node asset in dialogue:
 			DialogueNode newDNode = DialogueEditorHelper.createNewNode(dialogue);
 			// Create an editor node representation:
-			DialogueNodeEditor.Node newNode = DialogueNodeEditor.Node.Blank;
+			Node newNode = Node.Blank;
 			newNode.node = newDNode;
 
 			// Set newly created node as root node if no root has been assigned yet:
@@ -434,6 +434,9 @@ namespace UDialogue
 				// Save changes to asset:
 				DialogueEditorHelper.saveDialogueAsset(dialogue);
 			}
+
+			// Center the new node on screen:
+			newNode.rect.center = new Vector2(Screen.width, Screen.height) * 0.5f + offset;
 
 			// Add the new node representation to nodes list:
 			nodes.Add(newNode);

@@ -27,11 +27,12 @@ namespace UDialogue.Test
 
 		private bool isActive = true;
 
-		private Flag[] flags = new Flag[3]
+		private Flag[] flags = new Flag[4]
 		{
 			new Flag() { name="Romance", state=0 },
 			new Flag() { name="Hostile", state=0 },
-			new Flag() { name="PlaceHolder", state=1 }
+			new Flag() { name="Romance2", state=0 },
+			new Flag() { name="Quest", state=0 }
 		};
 
 		#endregion
