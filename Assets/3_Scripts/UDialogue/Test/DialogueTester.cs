@@ -8,6 +8,16 @@ namespace UDialogue.Test
 {
 	public class DialogueTester : MonoBehaviour, IBindingCore, IDialogueTrigger
 	{
+		#region Types
+
+		[System.Serializable]
+		public struct Flag
+		{
+			public string name;
+			public int state;
+		}
+
+		#endregion
 		#region Fields
 
 		public Dialogue dialogue = null;
@@ -16,6 +26,13 @@ namespace UDialogue.Test
 		private BindingExecutor bindingExecutor = null;
 
 		private bool isActive = true;
+
+		private Flag[] flags = new Flag[3]
+		{
+			new Flag() { name="Romance", state=0 },
+			new Flag() { name="Hostile", state=0 },
+			new Flag() { name="PlaceHolder", state=1 }
+		};
 
 		#endregion
 		#region Methods
@@ -31,7 +48,17 @@ namespace UDialogue.Test
 
 		void OnGUI()
 		{
-			if (!isActive || dialogue == null) return;
+			if (dialogue == null) return;
+			if(!isActive)
+			{
+				if(GUI.Button(new Rect(Screen.width*.5f, Screen.height*.5f, 200, 22), "Start Dialogue"))
+				{
+					isActive = true;
+					dialogueController.startDialogue();
+				}
+
+				return;
+			}
 
 			const float uiRespHeight = 22;
 			const float uiRespBlockHeight = uiRespHeight + 3;
@@ -104,6 +131,60 @@ namespace UDialogue.Test
 				default:
 					break;
 			}
+		}
+
+		public bool checkDialogueCondition(ref DialogueConditions condition)
+		{
+			// See if the condition requires a flag check:
+			string flagKeyword = "flag:";
+			if(!condition.keyword.Contains(flagKeyword)) return false;
+
+			// Retrieve the requested flag's name:
+			int flagNameIndex = condition.keyword.IndexOf(':') + 1;
+			string flagName = condition.keyword.Substring(flagNameIndex);
+
+			// Iterate through all flags and find a matching one:
+			for(int i = 0; i < flags.Length; ++i)
+			{
+				if(string.Compare(flags[i].name, flagName) == 0)
+				{
+					// Compare current state to the condition's target state value:
+					switch (condition.comparision)
+					{
+					case DialogueConditions.Comparison.Equal:
+						return flags[i].state == condition.targetState;
+					case DialogueConditions.Comparison.Different:
+						return flags[i].state != condition.targetState;
+					case DialogueConditions.Comparison.Greater:
+						return flags[i].state > condition.targetState;
+					case DialogueConditions.Comparison.Less:
+						return flags[i].state < condition.targetState;
+					default:
+						break;
+					}
+				}
+			}
+			// No match or unsupported comparison type, fail check:
+			return false;
+		}
+
+		public void raiseFlag(ref Binding binding)
+		{
+			// Find a flag with the name given in 'binding.eventString':
+			for(int i = 0; i < flags.Length; ++i)
+			{
+				if(string.Compare(flags[i].name, binding.eventString) == 0)
+				{
+					// Change state value of the flag:
+					flags[i].state = binding.eventValue;
+					binding.responseCode = BindingResponse.OK;
+
+					return;
+				}
+			}
+
+			// No flag with that name was found, report failure:
+			binding.responseCode = BindingResponse.Fail;
 		}
 
 		#endregion

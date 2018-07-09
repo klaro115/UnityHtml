@@ -26,7 +26,18 @@ MonoBehaviour:
     eventValue: 0
     eventString: 
   rootNodes:
-  - node: {fileID: 114218101850340150}
+  - conditions:
+      keyword: flag:Romance
+      comparision: 1
+      targetState: 1
+      relatedObject: {fileID: 0}
+    node: {fileID: 114218101850340150}
+  - conditions:
+      keyword: flag:Romance
+      comparision: 0
+      targetState: 1
+      relatedObject: {fileID: 0}
+    node: {fileID: 114896184322458160}
 --- !u!114 &114177795553884494
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -50,8 +61,18 @@ MonoBehaviour:
       eventString: 
   responses:
   - responseText: '[Leave dicreetly]'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
     nextNode: {fileID: 0}
   - responseText: '... Can I go now?'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
     nextNode: {fileID: 114454049409595624}
 --- !u!114 &114218101850340150
 MonoBehaviour:
@@ -76,10 +97,25 @@ MonoBehaviour:
       eventString: 
   responses:
   - responseText: How's it going?
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
     nextNode: {fileID: 114295821561744242}
   - responseText: What are the news?
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
     nextNode: {fileID: 114577768023057506}
   - responseText: '[Leave]'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
     nextNode: {fileID: 0}
 --- !u!114 &114295821561744242
 MonoBehaviour:
@@ -104,10 +140,25 @@ MonoBehaviour:
       eventString: 
   responses:
   - responseText: I feel ya, brother.
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
     nextNode: {fileID: 114355330719392628}
   - responseText: Sucks to be you.
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
     nextNode: {fileID: 114304624129262888}
   - responseText: '''aight. [Back away slowly]'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
     nextNode: {fileID: 114454049409595624}
 --- !u!114 &114304624129262888
 MonoBehaviour:
@@ -132,8 +183,18 @@ MonoBehaviour:
       eventString: 
   responses:
   - responseText: What about work?
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
     nextNode: {fileID: 114177795553884494}
   - responseText: '[Leave]'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
     nextNode: {fileID: 0}
 --- !u!114 &114355330719392628
 MonoBehaviour:
@@ -158,8 +219,18 @@ MonoBehaviour:
       eventString: 
   responses:
   - responseText: '[Awkwardly stand there]'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
     nextNode: {fileID: 114741023516838926}
   - responseText: '[Leave]'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
     nextNode: {fileID: 0}
 --- !u!114 &114454049409595624
 MonoBehaviour:
@@ -184,8 +255,18 @@ MonoBehaviour:
       eventString: 
   responses:
   - responseText: '[Fight]'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
     nextNode: {fileID: 0}
   - responseText: Wait. Shouldn't you be going to work now?
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
     nextNode: {fileID: 114177795553884494}
 --- !u!114 &114577768023057506
 MonoBehaviour:
@@ -210,6 +291,11 @@ MonoBehaviour:
       eventString: 
   responses:
   - responseText: What leads you to say this?
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
     nextNode: {fileID: 114988443489717490}
 --- !u!114 &114652429489560448
 MonoBehaviour:
@@ -252,8 +338,18 @@ MonoBehaviour:
       eventString: 
   responses:
   - responseText: You did what!? [Fight]
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
     nextNode: {fileID: 0}
   - responseText: Eh, shit happens. [Leave]
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
     nextNode: {fileID: 0}
 --- !u!114 &114741023516838926
 MonoBehaviour:
@@ -271,6 +367,44 @@ MonoBehaviour:
     text: Hey, um... Do you wanna, like, stay the night?
     timeout: -1
     eventBinding:
+      path: :raiseFlag
+      type: 0
+      responseCode: 1
+      eventValue: 1
+      eventString: Romance
+  responses:
+  - responseText: '[Run]'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 0}
+--- !u!114 &114896184322458160
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
+  m_Name: RomanceGreeting
+  m_EditorClassIdentifier: 
+  content:
+  - speakerId: 0
+    text: '''sup darling ;)'
+    timeout: -1
+    eventBinding:
+      path: 
+      type: 0
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  - speakerId: 0
+    text: You can stay the night, if you want...
+    timeout: -1
+    eventBinding:
       path: 
       type: 0
       responseCode: 0
@@ -278,6 +412,11 @@ MonoBehaviour:
       eventString: 
   responses:
   - responseText: '[Run]'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
     nextNode: {fileID: 0}
 --- !u!114 &114988443489717490
 MonoBehaviour:
@@ -312,6 +451,16 @@ MonoBehaviour:
       eventString: 
   responses:
   - responseText: Yeah, but you did get to work your dream job, right?
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
     nextNode: {fileID: 114177795553884494}
   - responseText: '[Try to leave]'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
     nextNode: {fileID: 114652429489560448}

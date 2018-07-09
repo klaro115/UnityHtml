@@ -88,6 +88,8 @@ namespace UDialogue
 			{
 				return currentNode.responses;
 			}
+
+			// TODO: Only return responses whose conditions have been met!!!
 		}
 
 		public bool startDialogue()
@@ -109,12 +111,28 @@ namespace UDialogue
 				}
 			}
 
-			// TODO: Check conditions for all root nodes, then select the first available one.
-
-			//...
-
-			//TEMP: Select the first available root node without checking anything:
 			DialogueRoot root = dialogue.rootNodes[0];
+			for(int i = 0; i < dialogue.rootNodes.Length; ++i)
+			{
+				DialogueRoot curRoot = dialogue.rootNodes[i];
+				// Ignore roots that (for whatever reason) don't have a node assigned:
+				if(curRoot.node == null) continue;
+
+				// Either chose a root with zero conditions:
+				if(string.IsNullOrEmpty(curRoot.conditions.keyword))
+				{
+					root = curRoot;
+					continue;
+				}
+				// Or pick a root where all conditions have been cleared:
+				else if(trigger != null && trigger.checkDialogueCondition(ref curRoot.conditions))
+				{
+					root = curRoot;
+					continue;
+				}
+				// NOTE: It's always the last matching root in the array that will be chosen as starting point!
+			}
+
 			bool started = selectNode(root.node);
 
 			// Notify the dialogue trigger of the start of a new dialogue:
