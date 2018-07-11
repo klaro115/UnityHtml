@@ -27,13 +27,16 @@ namespace UDialogue.Test
 
 		private bool isActive = true;
 
-		private Flag[] flags = new Flag[4]
+		private Flag[] flags = new Flag[5]
 		{
 			new Flag() { name="Romance", state=0 },
 			new Flag() { name="Hostile", state=0 },
 			new Flag() { name="Romance2", state=0 },
-			new Flag() { name="Quest", state=0 }
+			new Flag() { name="Quest", state=0 },
+			new Flag() { name="SpecialGoods", state=0 }
 		};
+
+		private float uiQuestPopupTime = 0.0f;
 
 		#endregion
 		#region Methods
@@ -43,8 +46,10 @@ namespace UDialogue.Test
 			isActive = dialogue != null;
 			dialogueController = new DialogueController();
 
-			dialogueController.loadDialogue(dialogue, this, this);
-			dialogueController.startDialogue();
+			dialogueController.loadDialogue(dialogue);
+			dialogueController.startDialogue(this, this);
+
+			uiQuestPopupTime = -10.0f;
 		}
 
 		void OnGUI()
@@ -55,7 +60,7 @@ namespace UDialogue.Test
 				if(GUI.Button(new Rect(Screen.width*.5f, Screen.height*.5f, 200, 22), "Start Dialogue"))
 				{
 					isActive = true;
-					dialogueController.startDialogue();
+					dialogueController.startDialogue(this, this);
 				}
 
 				return;
@@ -111,6 +116,20 @@ namespace UDialogue.Test
 
 			GUI.EndGroup();
 			GUI.EndGroup();
+
+			// Quest popup:
+			float questPopupDelta = Time.time - uiQuestPopupTime;
+			const float questPopupMaxTime = 3.0f;
+			if (questPopupDelta < questPopupMaxTime)
+			{
+				Color prevCol = GUI.color;
+
+				float alpha = 1 - Mathf.Clamp01((questPopupDelta - 1.0f) / (questPopupMaxTime - 1.0f));
+				GUI.color = new Color(1, 0.75f, 0, alpha);
+				GUI.Box(new Rect(Screen.width*.5f-180, 128, 360, 60), "New Quest:\n<b>Saving the princess.</b>");
+
+				GUI.color = prevCol;
+			}
 		}
 
 		public BindingResult executeBinding(ref Binding binding)
@@ -138,13 +157,18 @@ namespace UDialogue.Test
 		{
 			// See if the condition requires a flag check:
 			string flagKeyword = "flag:";
-			if(!condition.keyword.Contains(flagKeyword)) return false;
+			if(!condition.keyword.Contains(flagKeyword))
+			{
+				if (condition.keyword.Contains("checkMoney")) return checkMoney(condition.targetState, condition.comparision);
+				else if (condition.keyword.Contains("checkCharisma")) return checkCharisma(condition.targetState, condition.comparision);
+				else return false;
+			}
 
 			// Retrieve the requested flag's name:
 			int flagNameIndex = condition.keyword.IndexOf(':') + 1;
 			string flagName = condition.keyword.Substring(flagNameIndex);
 
-			// Iterate through all flags and find a matching one:
+			// Iterate through all flags and find a matching one:checkMoney
 			for(int i = 0; i < flags.Length; ++i)
 			{
 				if(string.Compare(flags[i].name, flagName) == 0)
@@ -169,6 +193,27 @@ namespace UDialogue.Test
 			return false;
 		}
 
+		private bool checkMoney(int amount, DialogueConditions.Comparison comparison)
+		{
+			// NOTE: Placeholder code/method for checking how the player's funds compare to the specified amount.
+
+			Debug.Log("Condition check: Checking if the player has sufficient funds in their inventory." +
+				"\nAmount required: " + amount + " - Comparison type: " + comparison.ToString());
+			return true;
+		}
+
+		private bool checkCharisma(int score, DialogueConditions.Comparison comparison)
+		{
+			// NOTE: Placeholder code/method for checking how the player's charisma score compares to the specified value.
+
+			Debug.Log("Condition check: Checking if the player has a sufficiently high charisma score." +
+				"\nScore required: " + score + " - Comparison type: " + comparison.ToString());
+			return true;
+		}
+
+		#endregion
+		#region Methods BindingListeners
+
 		public void raiseFlag(ref Binding binding)
 		{
 			// Find a flag with the name given in 'binding.eventString':
@@ -180,12 +225,38 @@ namespace UDialogue.Test
 					flags[i].state = binding.eventValue;
 					binding.responseCode = BindingResponse.OK;
 
+					// Enable a popup if the quest flag was raised:
+					if(i == 3 && flags[i].state != 0)
+					{
+						uiQuestPopupTime = Time.time;
+					}
+
 					return;
 				}
 			}
 
 			// No flag with that name was found, report failure:
 			binding.responseCode = BindingResponse.Fail;
+		}
+
+		public void startTrade(ref Binding binding)
+		{
+			// End ongoing dialogue:
+			dialogueController.endDialogue();
+
+			// See if black market should be shown as well:
+			bool showBlackMarket = binding.eventValue != 0;
+
+			// Open trade menu and filter goods:
+			Debug.Log("[TRADE NOT IMPLEMENTED] (show black market items: " + showBlackMarket.ToString() + ")");	//TODO
+		}
+
+		public void spendMoney(ref Binding binding)
+		{
+			// NOTE: Placeholder code/method for withdrawing an amount of money from the player's inventory.
+
+			int goldCoins = binding.eventValue;
+			Debug.Log("Removing money from player's inventory: " + goldCoins + " gold");
 		}
 
 		#endregion

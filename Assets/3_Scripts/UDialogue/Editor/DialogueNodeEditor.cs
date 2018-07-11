@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
+using UBindings;
+
 namespace UDialogue
 {
 	[System.Serializable]
@@ -84,8 +86,10 @@ namespace UDialogue
 			responseTargetNodeId = -1;	//<<<todo
 		}
 
-		public bool drawNodes(List<Node> inNodes, Vector2 inOffet)
+		public bool drawNodes(Dialogue asset, List<Node> inNodes, Vector2 inOffet)
 		{
+			if (asset == null || inNodes == null) return false;
+
 			offset = inOffet;
 
 			bool changed = false;
@@ -108,7 +112,9 @@ namespace UDialogue
 					// Links from dialogue root:
 					if(node.rootId >= 0)
 					{
-						drawNodeLink(rootPos, node);
+						DialogueRoot root = asset.rootNodes[node.rootId];
+						bool rootConditions = !string.IsNullOrEmpty(root.conditions.keyword);
+						drawNodeLink(rootPos, node, rootConditions);
 					}
 
 					// Links to response nodes:
@@ -138,9 +144,12 @@ namespace UDialogue
 									break;
 								}
 							}
-							
+
+							// Draw link in a different color if conditions apply for the associated response:
+							bool hasConditions = !string.IsNullOrEmpty(resp.conditions.keyword);
+
 							// Draw a bezier curve starting at the response button and leading to the connected node:
-							drawNodeLink(respPos, targetNode);
+							drawNodeLink(respPos, targetNode, hasConditions);
 						}
 					}
 				}
@@ -197,50 +206,68 @@ namespace UDialogue
 				{
 					Node respNode = selected;
 					DialogueNode respDNode = respNode.node;
+					DialogueResponse resp = respDNode.responses[selectedResponse];
+
+					const float w = 160;
+					const float h = 94;
 
 					Rect respRect = respNode.rect;
-					float respPosY = respRect.y+34 + (-respDNode.responses.Length*.5f + selectedResponse) * 17;
-					respRect = new Rect(respRect.x-offset.x+138,respPosY-offset.y,122,57);
+					float respPosY = Mathf.Round(respRect.y + 33 + (-respDNode.responses.Length*.5f + selectedResponse) * 17);
+					respRect = new Rect(respRect.x-offset.x+138,respPosY-offset.y,w+2,h+2);
 
 					GUI.BeginGroup(respRect);
 
-					EditorGUI.DrawRect(new Rect(0,0,122,57), Color.black);
-					EditorGUI.DrawRect(new Rect(1,1,120,55), new Color(0.75f,0.75f,0.75f));
+					EditorGUI.DrawRect(new Rect(0,0,w+2,h+2), Color.black);
+					EditorGUI.DrawRect(new Rect(1,1,w,h), new Color(0.75f,0.75f,0.75f));
 
-					if(GUI.Button(new Rect(2,2,118,16), "New Node"))
+					EditorGUI.LabelField(new Rect(2, 2, w, 16), string.Format("Edit response {0}:", selectedResponse));
+
+					// Button for creating a new node linked to this response:
+					if(GUI.Button(new Rect(2,20,78,16), "New Node"))
 					{
-						string assetPath = AssetDatabase.GetAssetPath(selected.node);
-						Dialogue asset = AssetDatabase.LoadMainAssetAtPath(assetPath) as Dialogue;
-
 						if (createNewNode(asset, ref nodes))
 						{
 							int newNodeId = nodes.Count - 1;
 							if(createNodeLink(selected, selectedResponse, newNodeId))
 							{
-								Debug.Log("Creating new node connected to selected node's response " + selectedResponse);
+								//Debug.Log("Creating new node connected to selected node's response " + selectedResponse);
 								setSelection(nodes[newNodeId]);
 							}
 						}
 					}
 
+					// Button for removing the currently set link:
 					bool uiShowClearLink = selected.node.responses != null &&
 						selectedResponse >= 0 &&
 						selectedResponse < selected.node.responses.Length &&
 						selected.node.responses[selectedResponse].nextNode == null;
 					EditorGUI.BeginDisabledGroup(uiShowClearLink);
-					if (GUI.Button(new Rect(2, 20, 118, 16), "Clear Link"))
+					if (GUI.Button(new Rect(82, 20, 78, 16), "Clear Link"))
 					{
-						Debug.Log("Resetting response " + selectedResponse + " in selected node.");
+						//Debug.Log("Resetting response " + selectedResponse + " in selected node.");
 						createNodeLink(respNode, selectedResponse, -1);
 					}
 					EditorGUI.EndDisabledGroup();
 
-					if (GUI.Button(new Rect(2,38,88,16), "Link to ID"))
+					// Button and input field for linking to a specific node using its displayed node ID:
+					if (GUI.Button(new Rect(2, 38, 128, 16), "Link to ID"))
 					{
-						if(createNodeLink(respNode, selectedResponse, responseTargetNodeId))
-							Debug.Log("Connecting selected node's response " + selectedResponse + " to node " + responseTargetNodeId);
+						createNodeLink(respNode, selectedResponse, responseTargetNodeId);
+						//Debug.Log("Connecting selected node's response " + selectedResponse + " to node " + responseTargetNodeId);
 					}
-					responseTargetNodeId = EditorGUI.DelayedIntField(new Rect(91,38,29,16), responseTargetNodeId);
+					responseTargetNodeId = EditorGUI.DelayedIntField(new Rect(131, 38, 29, 16), responseTargetNodeId);
+
+					bool prevChanged = GUI.changed;
+					GUI.changed = false;
+
+					EditorGUI.LabelField(new Rect(2, 60, 34, 16), "Text");
+					resp.responseText = EditorGUI.DelayedTextField(new Rect(36, 60, w - 36, 16), resp.responseText);
+
+					EditorGUI.LabelField(new Rect(2, 78, 34, 16), "Cond");
+					resp.conditions.keyword = EditorGUI.DelayedTextField(new Rect(36, 78, w - 36, 16), resp.conditions.keyword);
+
+					if (GUI.changed) EditorUtility.SetDirty(asset);
+					GUI.changed = GUI.changed || prevChanged;
 
 					GUI.EndGroup();
 				}
@@ -267,7 +294,9 @@ namespace UDialogue
 
 			// Draw content rect:
 			GUI.BeginGroup(new Rect(nRect));
-			EditorGUI.DrawRect(new Rect(0,0,128,68), new Color(0.75f,0.75f,0.75f));
+
+			Color boxColor = isSelected ? new Color(0.5f, 0.75f, 0.5f) : new Color(0.75f, 0.75f, 0.75f);
+			EditorGUI.DrawRect(new Rect(0,0,128,68), boxColor);
 			EditorGUI.DrawRect(new Rect(0,15,128,1), Color.black);
 			
 			DialogueNode dNode = node.node;
@@ -296,22 +325,32 @@ namespace UDialogue
 				dNode.content[0].text : "<empty>";
 			EditorGUI.LabelField(new Rect(0,17,106,16), contTxt, EditorStyles.miniLabel);
 			EditorGUI.LabelField(new Rect(0,34,106,16), "Contents: " + dNode.content.Length.ToString());
-			EditorGUI.LabelField(new Rect(0,51,106,16), "Responses: " + dNode.responses.Length.ToString());
+			for (int i = 0; i < dNode.content.Length; ++i)
+			{
+				Binding b = dNode.content[i].eventBinding;
+				if (!string.IsNullOrEmpty(b.path))
+				{
+					EditorGUI.LabelField(new Rect(0, 51, 126, 16), b.ToString(), EditorStyles.miniLabel);
+					break;
+				}
+			}				
 
 			// Button to select a node for content editing:
-			if(GUI.Button(new Rect(107,17,20,16), ">")) actions.selected = true;
+			if (GUI.Button(new Rect(107,17,20,16), ">")) actions.selected = true;
 			// Button for adding content items:
 			if(GUI.Button(new Rect(107,34,20,16), "+"))
 			{
 				actions.changed = true;
 				addNodeContent(dNode, dNode.content.Length);
 			}
+			/*
 			// Button for adding responses:
 			if(GUI.Button(new Rect(107,51,20,16), "+"))
 			{
 				actions.changed = true;
 				addNodeResponse(dNode);
 			}
+			*/
 
 			GUI.EndGroup();
 
@@ -320,7 +359,7 @@ namespace UDialogue
 			{
 				int respCount = dNode.responses.Length;
 				float respSize = respCount * 17.0f;
-				Rect respRect = new Rect(nRect.x+129, nRect.y+34-respSize*.5f, 100, respSize);
+				Rect respRect = new Rect(nRect.x+129, nRect.y+34-respSize*.5f, 100, respSize+17);
 
 				GUI.BeginGroup(respRect);
 				for(int i = 0; i < respCount; ++i)
@@ -339,6 +378,11 @@ namespace UDialogue
 					}
 					EditorGUI.LabelField(new Rect(20,i*17-1,80,16), response.responseText, EditorStyles.miniLabel);
 				}
+				if (isSelected && GUI.Button(new Rect(0, respCount * 17 - 1, 20, 16), "+"))
+				{
+					actions.changed = true;
+					addNodeResponse(dNode);
+				}
 				GUI.EndGroup();
 			}
 
@@ -348,25 +392,26 @@ namespace UDialogue
 			return actions;
 		}
 
-		private void drawNodeLink(Vector2 p0, Node target)
+		private void drawNodeLink(Vector2 p0, Node target, bool hasConditions = false)
 		{
 			p0 -= offset;
 			Vector2 p1 = target.rect.position + Vector2.up * target.rect.height * 0.5f - offset;
 
-			float tanLength = 32 * Mathf.Max(Vector2.Distance(p0, p1) / 74.0f, 1.0f);
+			float tanLength = 32 * Mathf.Max(Vector2.Distance(p0, p1) / 79.0f, 1.0f);
 			Vector2 t0 = new Vector2(tanLength, 0);
 			Vector2 t1 = new Vector2(-tanLength, 0);
 			if (p0.x > p1.x)
 			{
 				float vertTanLength = tanLength * 0.45f;
-				t0.y += vertTanLength;
-				t1.y += vertTanLength;
+				float yAdd = p0.y > p1.y ? vertTanLength : -vertTanLength;
+				t0.y += yAdd;
+				t1.y += yAdd;
 			}
 
-			Color c0 = new Color(0.0f, 0.9f, 1.0f);
-			Color c1 = new Color(0.0f, 0.9f, 1.0f, 0.5f);
-			Handles.DrawBezier(p0, p1, p0 + t0, p1 + t1, c0, null, 1);
-			Handles.DrawBezier(p0, p1, p0 + t0, p1 + t1, c1, null, 2);
+			Color c = hasConditions ? new Color(1.0f, 0.9f, 0.0f) : new Color(0.0f, 0.9f, 1.0f);
+			Handles.DrawBezier(p0, p1, p0 + t0, p1 + t1, c, null, 1);
+			c.a = 0.5f;
+			Handles.DrawBezier(p0, p1, p0 + t0, p1 + t1, c, null, 2);
 		}
 
 		private Vector2 getResponsePosition(Node node, int responseIndex)
@@ -377,11 +422,11 @@ namespace UDialogue
 			if(node.node == null || node.node.responses == null) return nRect.center;
 
 			int respCount = node.node.responses.Length;
-			float respSize = (respCount + 1) * 17.0f;
+			float respSize = (respCount + 2) * 17.0f;
 			float basePosY = nRect.center.y - 0.5f * respSize;
 
 			float x = nRect.x + nRect.width+16;
-			float y = basePosY + responseIndex * 17.0f+15;
+			float y = basePosY + responseIndex * 17.0f+22;
 
 			return new Vector2(x, y);
 		}
@@ -688,15 +733,14 @@ namespace UDialogue
 			}
 
 			// Calculate screen positions for all nodes:
-			//int[] depthCountsDone = new int[depthCounts.Count];
+			const float nodeOffsetX = 42;
+			const float nodeOffsetY0 = 10;
+			const float nodeHeight0 = 70;
 			for (int i = 0; i < nodes.Count; ++i)
 			{
-				const float nodeOffsetX = 32;
-				const float nodeOffsetY0 = 10;
-				const float nodeHeight0 = 70;
 				float nodeOffsetY = nodeOffsetY0 + (Screen.height - nodeHeight0) * 0.5f;
 
-				const float nodeWidth = 130 + 64 + 40;
+				const float nodeWidth = 130 + 64 + 50;
 				const float nodeHeight = nodeHeight0 + 18;
 
 				Node node = nodes[i];
@@ -713,8 +757,6 @@ namespace UDialogue
 
 				node.rect = new Rect(posX, posY, 130, 70);
 				nodes[i] = node;
-
-				//depthCountsDone[nDepth]++;
 			}
 		}
 

@@ -273,6 +273,7 @@ namespace UBindings
 				// Tell the author of this binding request that the operation was aborted:
 				binding.responseCode = BindingResponse.Error;
 
+				Debug.LogError("[BindingExecutor] Error! The binding '" + binding.ToString() + "' is invalid!");
 				return new BindingResult(BindingError.InvalidBinding);
 			}
 			

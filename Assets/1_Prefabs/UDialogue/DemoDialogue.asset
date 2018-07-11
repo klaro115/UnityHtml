@@ -16,13 +16,11 @@ MonoBehaviour:
   - name: You
   startBinding:
     path: 
-    type: 0
     responseCode: 0
     eventValue: 0
     eventString: 
   endBinding:
     path: 
-    type: 0
     responseCode: 0
     eventValue: 0
     eventString: 
@@ -64,20 +62,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   content:
   - speakerId: 0
-    text: By the way, your sister was abducted by some weirdo.
+    text: By the way, the princess was abducted by some weirdo.
     timeout: -1
     eventBinding:
-      path: :raiseFlag
-      type: 0
+      path: 
       responseCode: 1
-      eventValue: 1
-      eventString: Quest
+      eventValue: 0
+      eventString: 
   - speakerId: 1
     text: '... Why didn''t you tell me that earlier!?'
     timeout: -1
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 
@@ -85,11 +81,10 @@ MonoBehaviour:
     text: It kind of slipped my mind :P
     timeout: -1
     eventBinding:
-      path: 
-      type: 0
+      path: :raiseFlag
       responseCode: 0
-      eventValue: 0
-      eventString: 
+      eventValue: 1
+      eventString: Quest
   responses:
   - responseText: We'll just have to save her then.
     conditions:
@@ -115,7 +110,6 @@ MonoBehaviour:
     timeout: -1
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 
@@ -151,7 +145,6 @@ MonoBehaviour:
     timeout: 0
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 
@@ -194,7 +187,6 @@ MonoBehaviour:
     timeout: -1
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 
@@ -203,7 +195,6 @@ MonoBehaviour:
     timeout: -1
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 
@@ -232,7 +223,6 @@ MonoBehaviour:
     timeout: -1
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 
@@ -275,7 +265,6 @@ MonoBehaviour:
     timeout: -1
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 
@@ -311,7 +300,6 @@ MonoBehaviour:
     timeout: -1
     eventBinding:
       path: :raiseFlag
-      type: 0
       responseCode: 1
       eventValue: 1
       eventString: Romance2
@@ -340,7 +328,6 @@ MonoBehaviour:
     timeout: -1
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 
@@ -376,7 +363,6 @@ MonoBehaviour:
     timeout: -1
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 
@@ -412,7 +398,6 @@ MonoBehaviour:
     timeout: -1
     eventBinding:
       path: :raiseFlag
-      type: 0
       responseCode: 1
       eventValue: 1
       eventString: Hostile
@@ -448,7 +433,6 @@ MonoBehaviour:
     timeout: -1
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 
@@ -477,7 +461,6 @@ MonoBehaviour:
     timeout: -1
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 
@@ -486,7 +469,6 @@ MonoBehaviour:
     timeout: -1
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 
@@ -495,7 +477,6 @@ MonoBehaviour:
     timeout: -1
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 
@@ -524,7 +505,6 @@ MonoBehaviour:
     timeout: -1
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 
@@ -533,16 +513,14 @@ MonoBehaviour:
     timeout: -1
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 
   - speakerId: 0
-    text: Ya know, I kind of hooked up with your sister.
+    text: Ya know, I kind of hooked up with the princess.
     timeout: -1
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 
@@ -578,7 +556,6 @@ MonoBehaviour:
     timeout: -1
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 
@@ -607,7 +584,6 @@ MonoBehaviour:
     timeout: -1
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 
@@ -636,7 +612,6 @@ MonoBehaviour:
     timeout: -1
     eventBinding:
       path: :raiseFlag
-      type: 0
       responseCode: 1
       eventValue: 1
       eventString: Romance
@@ -668,11 +643,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   content:
   - speakerId: 0
-    text: Ready to go and save your sister from the evil sorcerer?
+    text: Ready to go and save your princess from the evil sorcerer? (again)
     timeout: -1
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 
@@ -708,7 +682,6 @@ MonoBehaviour:
     timeout: -1
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 
@@ -717,7 +690,6 @@ MonoBehaviour:
     timeout: -1
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 
@@ -753,7 +725,6 @@ MonoBehaviour:
     timeout: -1
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 
@@ -762,7 +733,6 @@ MonoBehaviour:
     timeout: -1
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 
@@ -792,7 +762,6 @@ MonoBehaviour:
     timeout: -1
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 
@@ -801,7 +770,6 @@ MonoBehaviour:
     timeout: -1
     eventBinding:
       path: 
-      type: 0
       responseCode: 0
       eventValue: 0
       eventString: 

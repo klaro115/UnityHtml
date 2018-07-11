@@ -75,6 +75,7 @@
     <Compile Include="Assets\3_Scripts\UDialogue\DialogueController.cs" />
     <Compile Include="Assets\3_Scripts\UDialogue\Interfaces\IDialogueTrigger.cs" />
     <Compile Include="Assets\3_Scripts\UDialogue\Test\DialogueTester.cs" />
+    <Compile Include="Assets\3_Scripts\UDialogue\Types\DialogueBehaviour.cs" />
     <Compile Include="Assets\3_Scripts\UDialogue\Types\DialogueCharacter.cs" />
     <Compile Include="Assets\3_Scripts\UDialogue\Types\DialogueConditions.cs" />
     <Compile Include="Assets\3_Scripts\UDialogue\Types\DialogueContent.cs" />
@@ -93,11 +94,11 @@
     <Compile Include="Assets\3_Scripts\Utml\Elements\UtmlInput.cs" />
     <Compile Include="Assets\3_Scripts\Utml\Elements\UtmlToggle.cs" />
     <None Include="Assets\1_Prefabs\Utml\Resources\Demo\UtmlDemo1.txt" />
-    <Reference Include="Unity.PackageManagerUI.Editor">
-      <HintPath>E:/Dokumente/Unity Projects/UnityHtml/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>E:/Dokumente/Unity Projects/UnityHtml/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.PackageManagerUI.Editor">
+      <HintPath>E:/Dokumente/Unity Projects/UnityHtml/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>E:/Programme/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>

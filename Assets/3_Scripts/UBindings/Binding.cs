@@ -11,7 +11,6 @@ namespace UBindings
 
 		// EXECUTION & BEHAVIOUR:
 		public string path;						// 'path'		Call and reference path relative to binding core.
-		public BindingType type;				// 'type'		Type of event this binds to.
 		public BindingResponse responseCode;	// 	-			Response code container after calling an event.
 
 		// STATUS PARAMETERS:
@@ -30,7 +29,6 @@ namespace UBindings
 				Binding b = new Binding();
 
 				b.path = null;
-				b.type = BindingType.SingleEvent;
 				b.responseCode = BindingResponse.None;
 
 				b.eventValue = 0;
@@ -40,6 +38,17 @@ namespace UBindings
 
 				return b;
 			}
+		}
+
+		public override string ToString()
+		{
+			object o = eventObject;
+			if(o == null)
+			{
+				if (!string.IsNullOrEmpty(eventString)) o = eventString;
+				else o = eventValue;
+			}
+			return string.Format("${0}({1})", path, o.ToString());
 		}
 
 		#endregion

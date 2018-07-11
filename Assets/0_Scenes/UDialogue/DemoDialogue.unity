@@ -229,7 +229,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27ea4434a85259042bec19cfd9e7a6f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dialogue: {fileID: 11400000, guid: 8f6c34ee76d92453e815b095f3ee6e97, type: 2}
+  dialogue: {fileID: 11400000, guid: 6d7d79567d8d65b48941afe2cb0363b1, type: 2}
 --- !u!4 &1462021755
 Transform:
   m_ObjectHideFlags: 0

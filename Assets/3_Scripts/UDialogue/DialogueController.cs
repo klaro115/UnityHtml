@@ -37,7 +37,7 @@ namespace UDialogue
 		#endregion
 		#region Methods
 
-		public bool loadDialogue(Dialogue asset, IDialogueTrigger inTrigger, IBindingCore inBindingCore)
+		public bool loadDialogue(Dialogue asset)
 		{
 			// Verify parameters and log warnings as needed:
 			if(asset == null)
@@ -45,15 +45,9 @@ namespace UDialogue
 				Debug.LogError("[DialogueController] Error! Dialogue asset may not be null!");
 				return false;
 			}
-			if(inBindingCore == null)
-			{
-				Debug.LogWarning("[DialogueController] Error! Null binding core may result in dialogue bindings not being resolved!");
-			}
 
 			// Instantiate a copy of the dialogue asset such as to not accidentially modify it runtime:
-			dialogue = Object.Instantiate<Dialogue>(asset);
-			trigger = inTrigger;
-			bindingCore = inBindingCore;
+			dialogue = Object.Instantiate(asset);
 
 			// Reset all flags, counters and references:
 			reset();
@@ -92,46 +86,30 @@ namespace UDialogue
 			return currentResponses.ToArray();
 		}
 
-		public bool startDialogue()
+		public bool startDialogue(IDialogueTrigger inTrigger, IBindingCore inBindingCore)
 		{
 			// NOTE: Returns false if the conditions for none of the root nodes were met!
 
-			if (dialogue == null) return false;
+			if (dialogue == null)
+			{
+				return false;
+			}
+			if (inBindingCore == null)
+			{
+				Debug.LogWarning("[DialogueController] Error! Null binding core may result in dialogue bindings not being resolved!");
+			}
+
+			trigger = inTrigger;
+			bindingCore = inBindingCore;
 
 			// Reset all flags, counters and references:
 			reset();
 
 			// Execute start binding right away:
-			if(bindingCore != null && !string.IsNullOrEmpty(dialogue.startBinding.path))
-			{
-				BindingResult result = bindingCore.executeBinding(ref dialogue.startBinding);
-				if (result.error != BindingError.Success)
-				{
-					Debug.LogError("[DialogueController] An error was encountered while trying to resolve the start binding!\nError type: " + result.error.ToString());
-				}
-			}
+			executeBinding(ref dialogue.startBinding);
 
-			DialogueRoot root = dialogue.rootNodes[0];
-			for(int i = 0; i < dialogue.rootNodes.Length; ++i)
-			{
-				DialogueRoot curRoot = dialogue.rootNodes[i];
-				// Ignore roots that (for whatever reason) don't have a node assigned:
-				if(curRoot.node == null) continue;
-
-				// Either chose a root with zero conditions:
-				if(string.IsNullOrEmpty(curRoot.conditions.keyword))
-				{
-					root = curRoot;
-					continue;
-				}
-				// Or pick a root where all conditions have been cleared:
-				else if(trigger != null && trigger.checkDialogueCondition(ref curRoot.conditions))
-				{
-					root = curRoot;
-					continue;
-				}
-				// NOTE: It's always the last matching root in the array that will be chosen as starting point!
-			}
+			DialogueRoot root = DialogueRoot.Blank;
+			getRootNode(ref root);
 
 			bool started = selectNode(root.node);
 
@@ -152,19 +130,12 @@ namespace UDialogue
 
 			if(dialogue == null)
 			{
-				Debug.LogError("[DialogueController] Error! Dialogue is null yet your are still trying to end it.");
+				Debug.LogError("[DialogueController] Error! Dialogue is null yet you are still trying to end it.");
 				return false;
 			}
 
 			// Execute end binding right away:
-			if (bindingCore != null && !string.IsNullOrEmpty(dialogue.endBinding.path))
-			{
-				BindingResult result = bindingCore.executeBinding(ref dialogue.endBinding);
-				if (result.error != BindingError.Success)
-				{
-					Debug.LogError("[DialogueController] An error was encountered while trying to resolve the start binding!\nError type: " + result.error.ToString());
-				}
-			}
+			executeBinding(ref dialogue.endBinding);
 
 			// End the dialogue and unload asset as required:
 			if(unloadDialogueAsset)
@@ -183,6 +154,32 @@ namespace UDialogue
 			}
 
 			return true;
+		}
+
+		private void getRootNode(ref DialogueRoot root)
+		{
+			// NOTE: It's always the last matching root in an array that will be chosen as starting point!
+
+			root = dialogue.rootNodes[0];
+			for (int i = 0; i < dialogue.rootNodes.Length; ++i)
+			{
+				DialogueRoot curRoot = dialogue.rootNodes[i];
+				// Ignore roots that (for whatever reason) don't have a node assigned:
+				if (curRoot.node == null) continue;
+
+				// Either chose a root with zero conditions:
+				if (string.IsNullOrEmpty(curRoot.conditions.keyword))
+				{
+					root = curRoot;
+					continue;
+				}
+				// Or pick a root where all conditions have been cleared:
+				else if (trigger != null && trigger.checkDialogueCondition(ref curRoot.conditions))
+				{
+					root = curRoot;
+					continue;
+				}
+			}
 		}
 
 		public bool selectNode(DialogueNode newNode)
@@ -205,14 +202,7 @@ namespace UDialogue
 			currentContentIndex = 0;
 
 			// Execute the new node's first content's binding:
-			if(bindingCore != null && !string.IsNullOrEmpty(currentNode.content[0].eventBinding.path))
-			{
-				BindingResult result = bindingCore.executeBinding(ref currentNode.content[0].eventBinding);
-				if(result.error != BindingError.Success)
-				{
-					Debug.LogError("[DialogueController] An error was encountered while trying to resolve a node's first binding!\nError type: " + result.error.ToString());
-				}
-			}
+			executeBinding(ref currentNode.content[0].eventBinding);
 
 			// Load the node's responses and extract those whose conditions have been met already:
 			DialogueResponse[] allResponses = CurrentNode.responses;
@@ -239,14 +229,18 @@ namespace UDialogue
 			// Ignore response index and show next content item instead, if multiple contents exist for the current node:
 			if(currentNode.content != null && currentNode.content.Length > 1 && currentContentIndex < currentNode.content.Length - 1)
 			{
+				// Increment content index:
+				currentContentIndex++;
+
+				// Execute any binding assigned to the new content:
+				executeBinding(ref currentNode.content[currentContentIndex].eventBinding);
+
 				// Notify the dialogue trigger that a next content will now be displayed:
 				if (trigger != null)
 				{
 					trigger.notifyDialogueEvent(DialogueEvent.ContentChanged);
 				}
 
-				// Increment content index:
-				currentContentIndex++;
 				return true;
 			}
 
@@ -272,13 +266,50 @@ namespace UDialogue
 				return selectNode(selected.nextNode);
 			}
 
-			// TODO: End dialogue or whatever. (todo: maybe add further behaviour settings to dialogue asset?)
+			// There was no followup node, so proceed according to the dialogue's behaviour mode instead:
+			DialogueBehaviour behaviour = dialogue.behaviour;
+			bool result = true;
 
-			//TEMP
-			endDialogue();
-			return true;
+			switch (behaviour.onNullResponse)
+			{
+				// End dialogue:
+				case DialogueBehaviour.NullResponseAction.End:
+					result = endDialogue();
+					break;
+				// Return to root node:
+				case DialogueBehaviour.NullResponseAction.ReturnToRoot:
+					{
+						DialogueRoot root = DialogueRoot.Blank;
+						getRootNode(ref root);
+						result = selectNode(root.node);
+					}
+					break;
+				// Refuse any further actions and just stay on the current node:
+				case DialogueBehaviour.NullResponseAction.None:
+					result = false;
+					break;
+				// Unidentified behaviour, throw an error. Though I can't even begin to imagine how you'd mess this one up:
+				default:
+					Debug.LogError("[DialogueController] Error! Unidentified NullResponse behaviour type: " + behaviour.onNullResponse.ToString());
+					result = false;
+					break;
+			}
+
+			return result;
 		}
 
+		private void executeBinding(ref Binding binding)
+		{
+			if (bindingCore != null && !string.IsNullOrEmpty(binding.path))
+			{
+				BindingResult result = bindingCore.executeBinding(ref binding);
+				if (result.error != BindingError.Success)
+				{
+					Debug.LogError("[DialogueController] An error was encountered while trying to resolve a binding!" +
+						"\nError type: " + result.error.ToString() + "\t - Binding: " + binding.ToString());
+				}
+			}
+		}
 
 		#endregion
 	}

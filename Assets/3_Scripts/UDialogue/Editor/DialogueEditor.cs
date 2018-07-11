@@ -92,13 +92,21 @@ namespace UDialogue
 			EditorGUI.DrawRect(new Rect(0, uiHeaderHeight,Screen.width, 1), Color.black);
 			EditorGUI.DrawRect(areaRect, Color.gray);
 
-			Dialogue newDialogue = (Dialogue)EditorGUI.ObjectField(new Rect(0,0,300,16), "Dialogue asset",
-				dialogue, typeof(Dialogue), false);
+			Dialogue newDialogue = (Dialogue)EditorGUI.ObjectField(new Rect(0,0,300,16), "Dialogue asset", dialogue, typeof(Dialogue), false);
 			if(newDialogue != dialogue)
 			{
+				// Assign new asset and reset selections:
 				dialogue = newDialogue;
 				assetChanged = true;
 				nodeEditor.setSelection(DialogueNodeEditor.Node.Blank);
+
+				// Rebuild node graph:
+				if(dialogue != null)
+				{
+					DialogueNodeEditor.createNodeList(dialogue, ref nodes);
+					nodeEditor.autoLayoutNodes();
+				}
+				return;
 			}
 
 			//Buttons for layouting:
@@ -168,7 +176,7 @@ namespace UDialogue
 			// Draw existing nodes in their relative positions here with all their dependencies.
 			if(dialogue != null && nodes != null)
 			{
-				assetChanged = assetChanged || nodeEditor.drawNodes(nodes, scrollPosition);
+				assetChanged = assetChanged || nodeEditor.drawNodes(dialogue, nodes, scrollPosition);
 			}
 
 			// Navigation elements:

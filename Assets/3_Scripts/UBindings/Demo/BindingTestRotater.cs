@@ -31,7 +31,7 @@ namespace UBindings.Test
 		public Rotator rotator = new Rotator() { rotSpeed=30.0f, transform=null };
 
 		// Structure instance holding the binding data:
-		public Binding binding = new Binding() { path="rotator/:setRotationSpeed", type=BindingType.SingleEvent };
+		public Binding binding = new Binding() { path="rotator/:setRotationSpeed" };
 		private BindingExecutor exec = null;
 
 		public bool outputDebugLogs = false;

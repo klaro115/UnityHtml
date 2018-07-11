@@ -29,8 +29,8 @@ namespace UBindings.Test
 		public Data data = new Data() { data2=new Data2() { text="This is a test." } };
 
 		// Structure instance holding the binding data:
-		public Binding binding = new Binding() { path="data/data2/=text", type=BindingType.SingleEvent };
-		public Binding binding2 = new Binding() { path="uiOutputField/=text", type=BindingType.SingleEvent };
+		public Binding binding = new Binding() { path="data/data2/=text" };
+		public Binding binding2 = new Binding() { path="uiOutputField/=text" };
 		private BindingExecutor exec = null;
 
 		#endregion

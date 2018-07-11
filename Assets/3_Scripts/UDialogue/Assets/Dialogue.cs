@@ -13,6 +13,8 @@ namespace UDialogue
 
 		public DialogueCharacter[] characters = new DialogueCharacter[1] { DialogueCharacter.Default };
 
+		public DialogueBehaviour behaviour = DialogueBehaviour.Default;
+
 		public Binding startBinding = Binding.Blank;	// Event triggered at the start of the dialogue.
 		public Binding endBinding = Binding.Blank;		// Event triggered when exiting the dialogue.
 

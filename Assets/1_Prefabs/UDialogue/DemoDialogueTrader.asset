@@ -1,0 +1,359 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a0fe175ff3884264b8824af8ead2cb0, type: 3}
+  m_Name: DemoDialogueTrader
+  m_EditorClassIdentifier: 
+  characters:
+  - name: Trader
+  behaviour:
+    onNullResponse: 1
+  startBinding:
+    path: 
+    responseCode: 0
+    eventValue: 0
+    eventString: 
+  endBinding:
+    path: 
+    responseCode: 0
+    eventValue: 0
+    eventString: 
+  rootNodes:
+  - conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    node: {fileID: 114711149068286560}
+--- !u!114 &114130611477352720
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
+  m_Name: StartBlackMarket
+  m_EditorClassIdentifier: 
+  content:
+  - speakerId: 0
+    text: '[Looking around suspiciously]'
+    timeout: -1
+    eventBinding:
+      path: 
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  - speakerId: 0
+    text: Right, there you go.
+    timeout: -1
+    eventBinding:
+      path: 
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  - speakerId: 0
+    text: '[Trade]'
+    timeout: -1
+    eventBinding:
+      path: :startTrade
+      responseCode: 0
+      eventValue: 1
+      eventString: 
+  responses:
+  - responseText: '[...]'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 0}
+--- !u!114 &114288699215580086
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
+  m_Name: StartTrade
+  m_EditorClassIdentifier: 
+  content:
+  - speakerId: 0
+    text: Sure, have a look.
+    timeout: -1
+    eventBinding:
+      path: 
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  - speakerId: 0
+    text: '[Trade]'
+    timeout: -1
+    eventBinding:
+      path: :startTrade
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  responses:
+  - responseText: '[Leave]'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 0}
+--- !u!114 &114460338602639386
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
+  m_Name: Info4Extra
+  m_EditorClassIdentifier: 
+  content:
+  - speakerId: 0
+    text: Well, aren't you a perceptive little brat?
+    timeout: -1
+    eventBinding:
+      path: :raiseFlag
+      responseCode: 1
+      eventValue: 1
+      eventString: SpecialGoods
+  - speakerId: 0
+    text: But you're right. I'm also doing a little business on the side. Sell off
+      some merch my friends from out of town bring over, if you catch my drift.
+    timeout: -1
+    eventBinding:
+      path: 
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  responses:
+  - responseText: '[Back]'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 114740715924744376}
+--- !u!114 &114514256780870420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
+  m_Name: Info1Business
+  m_EditorClassIdentifier: 
+  content:
+  - speakerId: 0
+    text: What can I say about business in the area? Well, there's the smith at the
+      town plaza for one.
+    timeout: -1
+    eventBinding:
+      path: 
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  - speakerId: 0
+    text: You can buy some mighty good ale over at the tavern, and there is a herbalist
+      over by the southern gate.
+    timeout: -1
+    eventBinding:
+      path: 
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  responses:
+  - responseText: '[Back]'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 114740715924744376}
+--- !u!114 &114526031982279572
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
+  m_Name: Info3BuyIn
+  m_EditorClassIdentifier: 
+  content:
+  - speakerId: 0
+    text: "[With a sly grin] Your patronage is ver\xA8y much appreciated."
+    timeout: -1
+    eventBinding:
+      path: :spendMoney
+      responseCode: 0
+      eventValue: 5
+      eventString: 
+  responses:
+  - responseText: '[...]'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 114460338602639386}
+--- !u!114 &114679838969434206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
+  m_Name: Info2Self
+  m_EditorClassIdentifier: 
+  content:
+  - speakerId: 0
+    text: There's no too much to say about mayself.
+    timeout: -1
+    eventBinding:
+      path: 
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  - speakerId: 0
+    text: I'm but a humble trader, trying to make a living, selling my wares on the
+      market.
+    timeout: -1
+    eventBinding:
+      path: 
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  responses:
+  - responseText: '[Back]'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 114740715924744376}
+  - responseText: '[Hand over 5 Gold coins] Surely, there must more to you.'
+    conditions:
+      keyword: checkMoney
+      comparision: 0
+      targetState: 5
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 114526031982279572}
+  - responseText: '[Charisma 15] Come on, you can trust me.'
+    conditions:
+      keyword: checkCharisma
+      comparision: 3
+      targetState: 14
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 114460338602639386}
+--- !u!114 &114711149068286560
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
+  m_Name: Greetings
+  m_EditorClassIdentifier: 
+  content:
+  - speakerId: 0
+    text: Hello traveller, how may I help you?
+    timeout: -1
+    eventBinding:
+      path: 
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  responses:
+  - responseText: Tell me about this place.
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 114740715924744376}
+  - responseText: I'd like to buy something.
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 114288699215580086}
+  - responseText: Show me your 'special' goods.
+    conditions:
+      keyword: flag:SpecialGoods
+      comparision: 0
+      targetState: 1
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 114130611477352720}
+  - responseText: '[Leave]'
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 0}
+--- !u!114 &114740715924744376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c805cdc8f82b43c591d5a1918287486, type: 3}
+  m_Name: Info0
+  m_EditorClassIdentifier: 
+  content:
+  - speakerId: 0
+    text: Well, this is the market. Is there anything specific you'd like to ask about?
+    timeout: -1
+    eventBinding:
+      path: 
+      responseCode: 0
+      eventValue: 0
+      eventString: 
+  responses:
+  - responseText: Local businesses?
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 114514256780870420}
+  - responseText: Tell me about yourself.
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 114679838969434206}
+  - responseText: That's all I wanted to know. [Back]
+    conditions:
+      keyword: 
+      comparision: 0
+      targetState: 0
+      relatedObject: {fileID: 0}
+    nextNode: {fileID: 114711149068286560}
