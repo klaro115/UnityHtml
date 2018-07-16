@@ -14,7 +14,7 @@ MonoBehaviour:
   characters:
   - name: Trader
   behaviour:
-    onNullResponse: 1
+    onNullResponse: 0
   startBinding:
     path: 
     responseCode: 0
@@ -69,7 +69,7 @@ MonoBehaviour:
       eventValue: 1
       eventString: 
   responses:
-  - responseText: '[...]'
+  - responseText: '[Trade]'
     conditions:
       keyword: 
       comparision: 0
@@ -141,14 +141,22 @@ MonoBehaviour:
       responseCode: 0
       eventValue: 0
       eventString: 
+  - speakerId: 0
+    text: '[Trade]'
+    timeout: -1
+    eventBinding:
+      path: :startTrade
+      responseCode: 0
+      eventValue: 1
+      eventString: 
   responses:
-  - responseText: '[Back]'
+  - responseText: '[Trade]'
     conditions:
       keyword: 
       comparision: 0
       targetState: 0
       relatedObject: {fileID: 0}
-    nextNode: {fileID: 114740715924744376}
+    nextNode: {fileID: 0}
 --- !u!114 &114514256780870420
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -200,7 +208,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   content:
   - speakerId: 0
-    text: "[With a sly grin] Your patronage is ver\xA8y much appreciated."
+    text: '[With a sly grin] Your patronage is very much appreciated.'
     timeout: -1
     eventBinding:
       path: :spendMoney
@@ -208,7 +216,7 @@ MonoBehaviour:
       eventValue: 5
       eventString: 
   responses:
-  - responseText: '[...]'
+  - responseText: So? About yourself?
     conditions:
       keyword: 
       comparision: 0
@@ -228,7 +236,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   content:
   - speakerId: 0
-    text: There's no too much to say about mayself.
+    text: There's not too much to say about mayself.
     timeout: -1
     eventBinding:
       path: 

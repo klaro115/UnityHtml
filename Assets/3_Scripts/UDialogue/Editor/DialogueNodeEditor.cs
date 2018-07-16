@@ -46,6 +46,11 @@ namespace UDialogue
 		//...
 
 		#endregion
+		#region Fields Settings
+		
+		public static bool showReturnLinks = false;	// Wether to hide return curves linking responses to nodes for better visibility.
+		
+		#endregion
 		#region Properties
 
 		public Node Selected
@@ -114,7 +119,7 @@ namespace UDialogue
 					{
 						DialogueRoot root = asset.rootNodes[node.rootId];
 						bool rootConditions = !string.IsNullOrEmpty(root.conditions.keyword);
-						drawNodeLink(rootPos, node, rootConditions);
+						drawNodeLink(rootPos, node, i, 0, rootConditions);
 					}
 
 					// Links to response nodes:
@@ -136,9 +141,11 @@ namespace UDialogue
 
 							// Figure out the editor node representing the response's connected node asset:
 							Node targetNode = Node.Blank;
-							foreach(Node n in nodes)
+							int k = 0;
+							for(k = 0; k < nodes.Count; ++k)
 							{
-								if(n.node == resp.nextNode)
+								Node n = nodes[k];
+								if (n.node == resp.nextNode)
 								{
 									targetNode = n;
 									break;
@@ -149,7 +156,7 @@ namespace UDialogue
 							bool hasConditions = !string.IsNullOrEmpty(resp.conditions.keyword);
 
 							// Draw a bezier curve starting at the response button and leading to the connected node:
-							drawNodeLink(respPos, targetNode, hasConditions);
+							drawNodeLink(respPos, targetNode, i, k, hasConditions);
 						}
 					}
 				}
@@ -392,12 +399,39 @@ namespace UDialogue
 			return actions;
 		}
 
-		private void drawNodeLink(Vector2 p0, Node target, bool hasConditions = false)
+		private void drawNodeLink(Vector2 p0, Node target, int nIndex0, int nIndex1, bool hasConditions = false)
 		{
 			p0 -= offset;
-			Vector2 p1 = target.rect.position + Vector2.up * target.rect.height * 0.5f - offset;
 
-			float tanLength = 32 * Mathf.Max(Vector2.Distance(p0, p1) / 79.0f, 1.0f);
+			Vector2 p1 = target.rect.position + Vector2.up * target.rect.height * 0.5f - offset;
+			Color c = hasConditions ? new Color(1.0f, 0.9f, 0.0f) : new Color(0.0f, 0.9f, 1.0f);
+
+			const float referenceLength = 79.0f;
+
+			// Depending on settings, don't draw the full curve for nodes that are both far apart and linked in reverse order:
+			if (!showReturnLinks && p0.x > p1.x + 5 * referenceLength)
+			{
+				Handles.color = c;
+				bool superPos = p0.y < p1.y;
+				Vector2 dir = Vector2.right * (referenceLength + 4);
+				Vector2 dir2 = Vector2.right * referenceLength * -0.4f;
+				Vector2 vDir = Vector2.up * 0.74f * (superPos ? 16 : -16);
+
+				// Only draw an angled stub:
+				Handles.DrawLine(p0, p0 + dir);
+				Handles.DrawLine(p0 + dir, p0 + dir + vDir);
+				Handles.DrawLine(p1, p1 + dir2);
+				Handles.DrawLine(p1 + dir2, p1 + dir2 - vDir);
+
+				// Draw the target/source node's index next to the lines:
+				GUI.Label(new Rect(p0.x + dir.x - 1, p0.y + (superPos ? 0 : vDir.y) - 2, 32, 22), nIndex1.ToString());
+				GUI.Label(new Rect(p1.x + dir2.x - 1, p1.y + (superPos ? -vDir.y : 0) - 2, 32, 22), nIndex0.ToString());
+
+				return;
+			}
+
+			// Modulate tangents' directions based on the nodes' positions relative to each other:
+			float tanLength = 32 * Mathf.Max(Vector2.Distance(p0, p1) / referenceLength, 1.0f);
 			Vector2 t0 = new Vector2(tanLength, 0);
 			Vector2 t1 = new Vector2(-tanLength, 0);
 			if (p0.x > p1.x)
@@ -408,7 +442,7 @@ namespace UDialogue
 				t1.y += yAdd;
 			}
 
-			Color c = hasConditions ? new Color(1.0f, 0.9f, 0.0f) : new Color(0.0f, 0.9f, 1.0f);
+			// Draw the curve:
 			Handles.DrawBezier(p0, p1, p0 + t0, p1 + t1, c, null, 1);
 			c.a = 0.5f;
 			Handles.DrawBezier(p0, p1, p0 + t0, p1 + t1, c, null, 2);

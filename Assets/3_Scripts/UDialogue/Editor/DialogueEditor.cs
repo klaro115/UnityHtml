@@ -223,6 +223,8 @@ namespace UDialogue
 					scrollPosition.y = Mathf.Round(findPos.y - Screen.height * 0.5f);
 				}
 
+				DialogueNodeEditor.showReturnLinks = GUI.Toggle(new Rect(70, 40, 106, 16), DialogueNodeEditor.showReturnLinks, "Show full curves");
+
 				GUI.EndGroup();
 			}
 
